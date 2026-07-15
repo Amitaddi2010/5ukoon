@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @import 'tailwindcss';
 @import 'tw-animate-css';
@@ -42,7 +42,7 @@
   --color-destructive-border: var(--destructive-border);
 
   --font-sans: var(--app-font-sans);
-  --font-serif: var(--app-font-serif);
+  --font-serif: var(--app-font-sans);
   --font-mono: var(--app-font-mono);
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -52,51 +52,44 @@
 }
 
 :root {
-  --background: 20 13% 5%;
-  --foreground: 40 20% 90%;
-  --border: 20 10% 15%;
-  --input: 20 10% 15%;
-  --ring: 43 74% 49%;
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --border: 0 0% 11%;
+  --input: 0 0% 8%;
+  --ring: 0 0% 100%;
 
-  --card: 20 11% 7%;
-  --card-foreground: 40 20% 90%;
-  --card-border: 20 10% 15%;
+  --card: 0 0% 4%;
+  --card-foreground: 0 0% 100%;
+  --card-border: 0 0% 14%;
 
-  --popover: 20 11% 7%;
-  --popover-foreground: 40 20% 90%;
-  --popover-border: 20 10% 15%;
+  --popover: 0 0% 4%;
+  --popover-foreground: 0 0% 100%;
+  --popover-border: 0 0% 14%;
 
-  --primary: 43 74% 49%;
-  --primary-foreground: 20 13% 5%;
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
 
-  --secondary: 353 50% 25%;
-  --secondary-foreground: 40 20% 90%;
+  --secondary: 0 0% 8%;
+  --secondary-foreground: 0 0% 100%;
 
-  --muted: 20 10% 15%;
-  --muted-foreground: 40 10% 60%;
+  --muted: 0 0% 8%;
+  --muted-foreground: 0 0% 42%;
 
-  --accent: 20 15% 12%;
-  --accent-foreground: 40 20% 90%;
+  --accent: 0 0% 8%;
+  --accent-foreground: 0 0% 100%;
 
-  --destructive: 0 62% 30%;
-  --destructive-foreground: 40 20% 90%;
+  --destructive: 0 62% 40%;
+  --destructive-foreground: 0 0% 100%;
 
-  --app-font-sans: 'Plus Jakarta Sans', sans-serif;
-  --app-font-serif: 'Playfair Display', serif;
+  --app-font-sans: 'Space Grotesk', sans-serif;
   --app-font-mono: Menlo, monospace;
-  --radius: 0.5rem;
+  --radius: 0.25rem;
 
-  --sidebar-primary-border: hsl(var(--primary));
-  --sidebar-accent-border: hsl(var(--accent));
   --primary-border: hsl(var(--primary));
   --secondary-border: hsl(var(--secondary));
   --muted-border: hsl(var(--muted));
   --accent-border: hsl(var(--accent));
   --destructive-border: hsl(var(--destructive));
-}
-
-.dark {
-  /* Enforce the same variables since this app is purely dark mode themed */
 }
 
 @layer base {
@@ -106,13 +99,15 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    font-weight: 300;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif;
+    @apply font-sans;
+    font-weight: 500;
   }
-}
 
-.ambient-glow {
-  background: radial-gradient(circle at center, rgba(200, 150, 50, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+  ::selection {
+    background: rgba(255,255,255,0.2);
+  }
 }
