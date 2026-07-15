@@ -3,20 +3,27 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Sukoon event management API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: events
+    description: Sukoon event editions
+  - name: requests
+    description: Attendance request management
+  - name: guests
+    description: Confirmed guest management and check-in
+  - name: admin
+    description: Admin authentication
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +31,255 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /events:
+    get:
+      operationId: listEvents
+      tags: [events]
+      summary: List upcoming public events
+      responses:
+        "200":
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+
+  /events/{id}:
+    get:
+      operationId: getEvent
+      tags: [events]
+      summary: Get a single event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Event detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "404":
+          description: Not found
+
+  /events/{id}/stats:
+    get:
+      operationId: getEventStats
+      tags: [events]
+      summary: Get seat stats for an event (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Event seat stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventStats"
+        "401":
+          description: Unauthorized
+
+  /requests:
+    get:
+      operationId: listRequests
+      tags: [requests]
+      summary: List all attendance requests for an event (admin only)
+      parameters:
+        - name: eventId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, approved, declined, waitlisted]
+      responses:
+        "200":
+          description: List of requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AttendanceRequest"
+        "401":
+          description: Unauthorized
+    post:
+      operationId: createRequest
+      tags: [requests]
+      summary: Submit an attendance request (public)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttendanceRequestInput"
+      responses:
+        "201":
+          description: Request submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttendanceRequest"
+        "400":
+          description: Validation error
+
+  /requests/{id}:
+    get:
+      operationId: getRequest
+      tags: [requests]
+      summary: Get a single attendance request (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Request detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttendanceRequest"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  /requests/{id}/status:
+    patch:
+      operationId: updateRequestStatus
+      tags: [requests]
+      summary: Approve, decline, or waitlist a request (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestStatusUpdate"
+      responses:
+        "200":
+          description: Updated request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttendanceRequest"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  /guests:
+    get:
+      operationId: listGuests
+      tags: [guests]
+      summary: List confirmed guests for an event (admin / check-in view)
+      parameters:
+        - name: eventId
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of guests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Guest"
+        "401":
+          description: Unauthorized
+
+  /guests/{id}/checkin:
+    patch:
+      operationId: checkInGuest
+      tags: [guests]
+      summary: Mark a guest as arrived (day-of check-in)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Guest checked in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guest"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+        "401":
+          description: Invalid credentials
+
+  /admin/logout:
+    post:
+      operationId: adminLogout
+      tags: [admin]
+      summary: Admin logout
+      responses:
+        "200":
+          description: Logged out
+
+  /admin/me:
+    get:
+      operationId: getAdminMe
+      tags: [admin]
+      summary: Get current admin session
+      responses:
+        "200":
+          description: Current admin
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+        "401":
+          description: Unauthorized
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +290,159 @@ components:
       required:
         - status
 
+    Event:
+      type: object
+      required: [id, title, editionNumber, date, city, venue, capacity, price, status]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        editionNumber:
+          type: integer
+        date:
+          type: string
+          format: date-time
+        city:
+          type: string
+        venue:
+          type: ["string", "null"]
+        capacity:
+          type: integer
+        price:
+          type: number
+        status:
+          type: string
+          enum: [upcoming, past, cancelled]
+        rsvpLink:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    EventStats:
+      type: object
+      required: [eventId, capacity, confirmed, pending, waitlisted, declined, arrived]
+      properties:
+        eventId:
+          type: integer
+        capacity:
+          type: integer
+        confirmed:
+          type: integer
+        pending:
+          type: integer
+        waitlisted:
+          type: integer
+        declined:
+          type: integer
+        arrived:
+          type: integer
+
+    AttendanceRequest:
+      type: object
+      required: [id, eventId, name, phone, email, status, createdAt]
+      properties:
+        id:
+          type: integer
+        eventId:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        socialHandle:
+          type: ["string", "null"]
+        heardAbout:
+          type: ["string", "null"]
+        mutualConnection:
+          type: ["string", "null"]
+        whyAttend:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, approved, declined, waitlisted]
+        ticketCode:
+          type: ["string", "null"]
+        checkedIn:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    AttendanceRequestInput:
+      type: object
+      required: [eventId, name, phone, email]
+      properties:
+        eventId:
+          type: integer
+        name:
+          type: string
+          minLength: 2
+        phone:
+          type: string
+          minLength: 10
+        email:
+          type: string
+        socialHandle:
+          type: string
+        heardAbout:
+          type: string
+        mutualConnection:
+          type: string
+        whyAttend:
+          type: string
+
+    RequestStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [approved, declined, waitlisted]
+
+    Guest:
+      type: object
+      required: [id, requestId, eventId, name, phone, email, ticketCode, checkedIn, status]
+      properties:
+        id:
+          type: integer
+        requestId:
+          type: integer
+        eventId:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        ticketCode:
+          type: string
+        checkedIn:
+          type: boolean
+        checkedInAt:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [confirmed, waitlisted]
+
+    AdminLoginInput:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    AdminSession:
+      type: object
+      required: [username, name]
+      properties:
+        username:
+          type: string
+        name:
+          type: string

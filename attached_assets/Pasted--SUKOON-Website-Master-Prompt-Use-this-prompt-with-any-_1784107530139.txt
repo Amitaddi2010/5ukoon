@@ -1,0 +1,107 @@
+# SUKOON — Website Master Prompt
+
+Use this prompt with any AI website builder (Claude, v0, Lovable, Framer AI, etc.) or hand it to a developer as a brief.
+
+---
+
+## MASTER PROMPT
+
+Build a single-page website for **Sukoon** — a curated evening experience in Chandigarh that blends live music, shayari, and guided storytelling to create a socially-safe space for emotional expression. Positioned between "therapy" (too clinical) and "partying" (too avoidant) — a mehfil-style format for urban professionals who need to feel without needing to explain themselves.
+
+**Tagline:** "जहाँ महसूस करना मना नहीं" (Where feeling is not forbidden)
+
+### Brand Tone
+Warm, intimate, culturally rooted (Hindustani/Urdu poetic sensibility) — not corporate wellness, not clinical mental-health branding. Think mehfil/baithak aesthetic: candlelight, deep jewel tones (maroon, mustard, deep teal, gold accents), textured/warm backgrounds — not sterile pastel "wellness app" design. Typography should mix a serif or Devanagari-friendly display font for headings with a clean sans for body text.
+
+### Site Sections (single-page scroll, in this order)
+
+1. **Hero**
+   - Sukoon wordmark + tagline
+   - One-line pitch: "An evening of music, poetry, and stories — for feeling what you usually suppress."
+   - Primary CTA: "Reserve Your Spot" (or "Join the Next Sukoon")
+   - Subtle ambient visual — candle glow, string lights, or abstract raga-wave motif (no stock therapy imagery)
+
+2. **The Problem / Why Sukoon**
+   - Short section: urban professionals are emotionally constipated — therapy has stigma/cost, partying is avoidant not expressive. Sukoon is the missing middle.
+
+3. **The Arc — How It Works**
+   Visual timeline/flow of the 5 phases:
+   - Aagaz (Arrival) — ambient music, decompression
+   - Sur (The Concert) — live music, collective release
+   - Alfaaz (Shayari Circle) — voluntary open mic
+   - Kahaani (Story Circles) — small-group storytelling, witnessed not advised
+   - Sukoon (Release) — return to lightness, food, conversation
+   Use icons or minimal line illustrations per phase, not photos.
+
+4. **Why It Works**
+   Short trust-building copy: progressive vulnerability, small-batch intimacy (20-30 pax), cultural fluency of shayari/mehfil, deliberate "soft landing" ending.
+
+5. **Safety & Norms**
+   Brief, reassuring: not therapy, no advice-giving in circles, facilitator-supported, consent-based sharing, confidentiality expected of all guests. This builds trust and covers you legally/reputationally — don't skip it.
+
+6. **Upcoming Event**
+   - Date, city (Chandigarh), venue (reveal closer to date if needed), price, capacity (e.g. "Limited to 25 seats")
+   - Ticket/RSVP CTA — link to a form (Google Form/Instamojo/Razorpay payment link is fine for pilot stage)
+
+7. **Team / Hosts**
+   Short, warm bios (not corporate) for Amit Raj Saraswat (Concept & Host), Chetan Thakur (Music), etc. — photos + one line each on why they're part of this.
+
+8. **Testimonials / Social Proof** (add after pilot event — placeholder section for now, or omit until you have quotes)
+
+9. **FAQ**
+   Is this therapy? Do I have to share? Is it religious/spiritual? Can I bring a friend? What if I want to just listen?
+
+10. **Footer**
+    Instagram/WhatsApp community link, contact, city (Chandigarh), copyright.
+
+### Functional Requirements
+- Fully responsive (mobile-first — most traffic will be Instagram-referred)
+- Single primary CTA repeated at top and bottom (RSVP/reserve spot)
+- Fast load, minimal JS — this is a trust/emotion page, not an app
+- Optional: embed the Chakra Sutra ambient bansuri track as background audio (muted by default, user-toggle to play) to give visitors a taste of the "Aagaz" phase before they even attend
+
+### What to avoid
+- Generic wellness-app visual language (soft gradients, meditation app icons, stock photos of people meditating)
+- Clinical/therapy-adjacent language ("healing journey," "mental health intervention")
+- Anything that makes this look like a startup pitch deck rather than an invitation to a real, warm evening
+
+---
+
+## How to use this
+- **Paste as-is** into Claude, v0.dev, Lovable, or similar AI website builders.
+- If briefing a human developer, this doubles as the creative brief — add your logo/color hex codes once finalized.
+- For the pilot stage, a Framer, Carrd, or single Next.js page is sufficient — don't over-invest in the website before the pilot event validates demand.
+
+---
+
+# ADDENDUM — Event Management System, Team Profiles & Guest Vetting
+
+This section extends the site from a static marketing page into a functioning system with three new components: (1) a public-facing core team/curator profile section, (2) a request-to-attend flow with a screening step before any seat is confirmed, and (3) a lightweight admin backend where your team manages applications, approvals, and the guest list for each numbered edition. Below is the reasoning first, then a second master prompt you can paste in addition to the first one.
+
+## Why vet guests at all
+At 30 seats in a private/home setting with strangers sharing personal stories, an open "buy now" ticket link is a real liability — both for guest safety and for you as host, since you have zero ability to remove a bad actor once they've paid and shown up. A request → review → confirm flow solves two problems at once: it protects the room, and it reinforces the "curated, not purchased" positioning you're going for. The friction is the feature.
+
+## System Architecture
+
+**1. Team/Curator Profiles (public page)**
+Each core team member gets a short profile: name, role, one-line bio, and what they bring to the room (Chetan as performing artist, Rupali as circle facilitator, etc.). This isn't a corporate "About Us" — it should read like programme notes for a concert, building trust that real, named, accountable people are running this, not an anonymous event page.
+
+**2. Request-to-Attend Flow (guest-facing)**
+Replace "Buy Ticket" with "Request an Invitation." The flow: guest fills a short form (name, contact, how they heard about Sukoon, one line on why they want to attend) → submission goes into a pending queue → your team reviews and either confirms (triggers payment link + confirmation ticket) or declines (polite auto-message, no reason required). This is your actual screening step — it's manual curation, not an algorithm, at this scale.
+
+**3. Security/Screening Checks (before ticket confirmation)**
+Practical, non-paranoid checks appropriate for a 30-person home gathering, not a corporate security protocol:
+- Basic identity confirmation (phone number OTP verification + one working social profile — Instagram/LinkedIn — cross-checked against the name given)
+- Mutual-connection field ("who invited you / do you know anyone attending") — this is your strongest actual signal at this scale, since most quality curated events grow through trusted referral chains, not cold applications
+- A soft cap on cold/unreferred applicants per edition (e.g. no more than 8-10 of 30 seats go to people with zero mutual connection to the existing circle) — keeps the room's trust level high
+- Payment only requested after approval, never before — this avoids the ethical/legal grey zone of taking money from someone before you've decided they're a fit for the room
+
+**4. Ticket Confirmation & Management (admin backend)**
+Once approved and paid, the guest receives a digital confirmation ticket (QR code or simple unique code) tied to their profile. Your team (likely Ajay for logistics) uses a simple check-in view on event day — scan/search the code, mark arrived. This also gives you a clean guest list per edition for Tanvi's curation records and for any future "who's attended before" continuity across editions.
+
+## MASTER PROMPT — Event Management Layer (paste as a follow-up prompt after the design one)
+
+Extend the Sukoon website with a functioning event management system while preserving the existing dark-mode, restrained-luxury visual language. Add a public **Curators & Artists** section with a card for each core team member — name, role (Concept & Host, Performing Artist, Sound & Technical, Venue & Logistics, Guest Curation, Story Circle Facilitator), a short one-line editorial bio, and a subtle hover reveal showing one additional line about what they bring to the room — styled as programme notes, not corporate headshots, using the same restrained typography and gold-accent hover states as the rest of the site. Replace any direct ticket-purchase button with a **Request an Invitation** flow: a multi-step form (styled with the same smooth-easing transitions as the rest of the site, one question per screen rather than a long form, with a subtle progress indicator) collecting name, phone number, email, Instagram or LinkedIn handle, how they heard about Sukoon, whether they know anyone currently confirmed for that edition, and one short free-text field on why they want to attend — on submission, show a quiet confirmation state ("Your request has been received — we'll be in touch within 48 hours") rather than an instant ticket, since the approval step happens on the backend, not automatically. Build a lightweight admin dashboard, access-restricted to the core team via login, that shows all pending requests for the current edition in a card or table view with each applicant's submitted details, a mutual-connections indicator, and Approve / Decline / Waitlist actions — approving a request should trigger an automated confirmation email or WhatsApp-style message to the guest containing a payment link, and only after payment is received should the system auto-generate and send a unique digital ticket containing a QR code or short alphanumeric code, the edition number, date, and a reminder of the evening's norms (confidentiality, no recording, no advice-giving). Include a running seat counter visible only in the admin view (e.g. "22 of 30 confirmed, 5 pending, 3 waitlisted") so the team always knows real-time capacity, and build in a soft rule in the approval logic description (as a comment or note in the UI, not necessarily hard-coded) that no more than roughly a third of seats per edition should go to applicants with zero mutual connection to previously confirmed guests, to preserve trust density in the room. Add a simple day-of check-in view, usable on a phone, where Ajay or any team member can search a guest by name or scan their ticket QR code and mark them as arrived, with the list visually distinguishing arrived / confirmed-not-arrived / waitlisted guests. Maintain the existing visual identity throughout — dark near-black backgrounds, gold accent highlights, serif display type for headings, generous whitespace, smooth restrained transitions — so the admin and guest-facing management screens feel like an extension of the same premium brand rather than a bolted-on generic dashboard.
+
+## Build Note (practical, not just aesthetic)
+A true custom backend (auth, database, payment webhook, QR generation) is a real build — not a weekend v0 prompt. For the next 2-3 editions, consider a **hybrid approach**: keep the beautiful front-end as designed above, but route the actual request form to a simple Google Form or Tally.so form (mirrors your admin's approval fields), manage approvals in a shared spreadsheet or Notion board, and use a free tool like Luma or a simple ticketing link for the paid confirmation + QR check-in step. This gets you 90% of the trust-building visual experience and 100% of the actual vetting control, without needing custom dev work before you've run more than one or two editions and know the real volume of applications you're dealing with.
