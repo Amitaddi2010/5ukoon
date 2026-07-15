@@ -83,7 +83,7 @@ export function Home() {
             <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">01</span>
           </div>
           <div>
-            <h2 className="text-4xl md:text-6xl font-medium text-white mb-10 leading-tight tracking-tight">
+            <h2 className="font-display font-normal text-4xl md:text-6xl text-white mb-10 leading-[1.05] tracking-[-0.02em]">
               The Missing<br />Middle
             </h2>
             <div className="grid md:grid-cols-2 gap-10 text-[15px] leading-loose text-white/55 font-light max-w-4xl">
@@ -108,7 +108,7 @@ export function Home() {
               <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">02</span>
             </div>
             <div>
-              <h2 className="text-4xl md:text-6xl font-medium text-white leading-tight tracking-tight">
+              <h2 className="font-display font-normal text-4xl md:text-6xl text-white leading-[1.05] tracking-[-0.02em]">
                 The Evening's<br />Arc (05)
               </h2>
               <p className="mt-6 text-[14px] text-white/45 tracking-wide font-light">
@@ -137,7 +137,7 @@ export function Home() {
                   {phase.num}
                 </span>
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-10 flex-1">
-                  <h3 className="text-[13px] tracking-[0.18em] font-medium text-white min-w-[100px]">
+                  <h3 className="font-display font-normal text-[15px] tracking-[0.1em] text-white min-w-[100px]">
                     {phase.title}
                   </h3>
                   <span className="text-[13px] text-white/40 font-light min-w-[220px]">{phase.sub}</span>
@@ -158,7 +158,7 @@ export function Home() {
           </motion.div>
           <div className="grid md:grid-cols-2 gap-16">
             <motion.div {...fadeUp}>
-              <h2 className="text-3xl md:text-4xl font-medium text-white mb-10 leading-tight tracking-tight">
+              <h2 className="font-display font-normal text-3xl md:text-5xl text-white mb-10 leading-[1.05] tracking-[-0.02em]">
                 Why It Works
               </h2>
               <div className="space-y-8">
@@ -181,7 +181,7 @@ export function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.15 }}
             >
-              <h2 className="text-3xl md:text-4xl font-medium text-white mb-10 leading-tight tracking-tight">
+              <h2 className="font-display font-normal text-3xl md:text-5xl text-white mb-10 leading-[1.05] tracking-[-0.02em]">
                 Safety & Norms
               </h2>
               <div className="space-y-6 text-[14px] text-white/55 font-light leading-relaxed">
@@ -203,7 +203,7 @@ export function Home() {
           </motion.div>
           <motion.div {...fadeUp}>
             <p className="text-[11px] tracking-[0.18em] text-white/30 uppercase mb-6 font-medium">Next Edition</p>
-            <h2 className="text-4xl md:text-6xl font-medium text-white mb-16 leading-tight tracking-tight">
+            <h2 className="font-display font-normal text-4xl md:text-7xl text-white mb-16 leading-[1.0] tracking-[-0.02em]">
               {nextEvent?.title ?? "Sukoon: Edition I"}
             </h2>
 
@@ -247,7 +247,7 @@ export function Home() {
             <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">05</span>
           </motion.div>
           <motion.div {...fadeUp} className="w-full">
-            <h2 className="text-4xl md:text-5xl font-medium text-white mb-16 leading-tight tracking-tight">
+            <h2 className="font-display font-normal text-4xl md:text-6xl text-white mb-16 leading-[1.05] tracking-[-0.02em]">
               The Curators (03)
             </h2>
             <div className="w-full">
@@ -264,7 +264,7 @@ export function Home() {
                   transition={{ duration: 0.5, delay: i * 0.08 }}
                   className="border-t border-white/[0.08] py-7 flex flex-col md:flex-row md:items-center gap-4 md:gap-0 group"
                 >
-                  <h3 className="text-[18px] md:text-[20px] font-medium text-white tracking-tight flex-[2]">
+                  <h3 className="font-display font-normal text-[22px] md:text-[26px] text-white tracking-[-0.01em] flex-[2]">
                     {person.name}
                   </h3>
                   <p className="text-[12px] tracking-[0.14em] text-white/35 uppercase font-medium flex-1">
@@ -288,7 +288,7 @@ export function Home() {
             <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">06</span>
           </motion.div>
           <motion.div {...fadeUp} className="w-full">
-            <h2 className="text-4xl md:text-5xl font-medium text-white mb-16 leading-tight tracking-tight">
+            <h2 className="font-display font-normal text-4xl md:text-6xl text-white mb-16 leading-[1.05] tracking-[-0.02em]">
               Voices from<br />the Room
             </h2>
             <div className="grid md:grid-cols-3 gap-0">
@@ -305,7 +305,7 @@ export function Home() {
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   className={`p-8 md:p-10 flex flex-col ${i < 2 ? "md:border-r border-white/[0.08]" : ""} border-t border-white/[0.08] md:border-t-0`}
                 >
-                  <p className="text-[15px] font-light text-white/70 leading-loose flex-1 mb-8">
+                  <p className="font-serif text-[16px] text-white/70 leading-loose flex-1 mb-8 italic">
                     &ldquo;{t.quote}&rdquo;
                   </p>
                   <p className="text-[11px] tracking-[0.15em] text-white/30 uppercase font-medium">
@@ -325,7 +325,7 @@ export function Home() {
             <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">07</span>
           </motion.div>
           <motion.div {...fadeUp} className="w-full">
-            <h2 className="text-4xl md:text-5xl font-medium text-white mb-16 leading-tight tracking-tight">
+            <h2 className="font-display font-normal text-4xl md:text-6xl text-white mb-16 leading-[1.05] tracking-[-0.02em]">
               Common<br />Inquiries
             </h2>
             <div className="w-full max-w-3xl">
@@ -346,7 +346,7 @@ export function Home() {
       {/* ─── FOOTER ───────────────────────────────────────────── */}
       <footer id="contact" className="border-t border-white/[0.08] px-6 md:px-10 py-8">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <span className="text-[13px] font-medium tracking-[0.18em] uppercase text-white">SUKOON©</span>
+          <span className="font-display text-[15px] tracking-[0.14em] uppercase text-white">SUKOON©</span>
 
           <div className="flex items-center gap-8">
             <a href="#" className="text-[12px] text-white/40 hover:text-white transition-colors tracking-wide">Instagram</a>

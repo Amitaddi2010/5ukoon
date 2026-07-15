@@ -8,7 +8,7 @@ export function Navbar() {
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 h-[52px] border-b border-white/[0.08] bg-black/90 backdrop-blur-md">
         {/* Logo */}
-        <Link href="/" className="text-[13px] font-medium tracking-[0.18em] uppercase text-white select-none">
+        <Link href="/" className="font-display text-[15px] tracking-[0.14em] uppercase text-white select-none">
           SUKOON©
         </Link>
 
@@ -24,7 +24,7 @@ export function Navbar() {
             <a
               key={href}
               href={href}
-              className="text-[13px] text-white/55 hover:text-white transition-colors duration-200 tracking-wide"
+              className="font-sans text-[13px] text-white/55 hover:text-white transition-colors duration-200 tracking-wide"
             >
               {label}
             </a>
