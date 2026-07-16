@@ -6,7 +6,7 @@
     "build": "pnpm run typecheck && pnpm -r --if-present run build",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
-    "hostinger-build": "npm install -g pnpm && pnpm install && pnpm run build",
+    "hostinger-build": "npx pnpm install && npx pnpm run build",
     "start": "node artifacts/api-server/dist/index.mjs"
   },
   "private": true,
