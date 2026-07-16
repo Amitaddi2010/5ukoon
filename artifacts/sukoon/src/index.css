@@ -118,6 +118,7 @@
 
   --app-font-sans: 'Inter', sans-serif;
   --app-font-display: 'Coolvetica Condensed', sans-serif;
+  --app-font-display-heavy: 'Coolvetica Heavy Compressed', sans-serif;
   --app-font-serif: 'Gloock', serif;
   --app-font-mono: Menlo, monospace;
   --radius: 0.25rem;
@@ -127,6 +128,43 @@
   --muted-border: hsl(var(--muted));
   --accent-border: hsl(var(--accent));
   --destructive-border: hsl(var(--destructive));
+
+  --destructive-border: hsl(var(--destructive));
+
+  /* ── Premium Gold accent ─────────────────────────────────────────── */
+  --accent-gold: #C5A059;
+  --accent-gold-rgb: 197, 160, 89;
+  --accent-gold-glow: 0 0 20px rgba(197, 160, 89, 0.3);
+}
+
+/* ── Lenis smooth scrolling ─────────────────────────────────────────── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* ── Custom cursor (desktop only) ───────────────────────────────────── */
+@media (pointer: fine) {
+  html:has(.custom-cursor-dot) *,
+  html:has(.custom-cursor-dot) {
+    cursor: none !important;
+  }
 }
 
 @layer base {
@@ -141,6 +179,51 @@
   }
 
   ::selection {
-    background: rgba(255,255,255,0.18);
+    background: rgba(197, 160, 89, 0.25);
   }
+}
+
+/* ── Gold accent utility classes ───────────────────────────────────── */
+.accent-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-gold);
+  display: inline-block;
+}
+
+.accent-dot-pulse {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--accent-gold);
+  display: inline-block;
+  animation: pulse-gold 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse-gold {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-gold-rgb), 0.5);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 16px 6px rgba(var(--accent-gold-rgb), 0);
+    transform: scale(1.15);
+  }
+}
+
+/* ── Global glassmorphic noise overlay ────────────────────────────── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ── FAQ smooth animation helper ────────────────────────────────────── */
+.faq-content {
+  overflow: hidden;
 }

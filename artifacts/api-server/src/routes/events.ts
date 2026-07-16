@@ -13,7 +13,7 @@ router.get("/events", async (req, res) => {
       .from(eventsTable)
       .orderBy(eventsTable.date);
     return res.json(
-      events.map((e) => ({
+      events.map((e: any) => ({
         ...e,
         price: Number(e.price),
         date: e.date.toISOString(),

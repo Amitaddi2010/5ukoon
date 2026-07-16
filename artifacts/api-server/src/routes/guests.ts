@@ -21,8 +21,8 @@ router.get("/guests", async (req, res) => {
 
   try {
     let rows = await db.select().from(guestsTable).orderBy(guestsTable.name);
-    if (eventId) rows = rows.filter((g) => g.eventId === Number(eventId));
-    return res.json(rows.map(serializeGuest));
+    if (eventId) rows = rows.filter((g: any) => g.eventId === Number(eventId));
+    return res.json(rows.map((g: any) => serializeGuest(g)));
   } catch (err) {
     req.log.error({ err }, "Failed to list guests");
     return res.status(500).json({ error: "Internal server error" });

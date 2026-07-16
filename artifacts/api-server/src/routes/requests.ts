@@ -25,9 +25,9 @@ router.get("/requests", async (req, res) => {
 
   try {
     let rows = await db.select().from(attendanceRequestsTable).orderBy(attendanceRequestsTable.createdAt);
-    if (eventId) rows = rows.filter((r) => r.eventId === Number(eventId));
-    if (status) rows = rows.filter((r) => r.status === status);
-    return res.json(rows.map(serializeRequest));
+    if (eventId) rows = rows.filter((r: any) => r.eventId === Number(eventId));
+    if (status) rows = rows.filter((r: any) => r.status === status);
+    return res.json(rows.map((r: any) => serializeRequest(r)));
   } catch (err) {
     req.log.error({ err }, "Failed to list requests");
     return res.status(500).json({ error: "Internal server error" });

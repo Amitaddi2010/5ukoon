@@ -1,23 +1,21 @@
-import { pgTable, serial, text, integer, boolean, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { eventsTable } from "./events";
 import { attendanceRequestsTable } from "./requests";
 
-export const guestStatusEnum = pgEnum("guest_status", ["confirmed", "waitlisted"]);
-
-export const guestsTable = pgTable("guests", {
-  id: serial("id").primaryKey(),
+export const guestsTable = sqliteTable("guests", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   requestId: integer("request_id").notNull().references(() => attendanceRequestsTable.id),
   eventId: integer("event_id").notNull().references(() => eventsTable.id),
   name: text("name").notNull(),
   phone: text("phone").notNull(),
   email: text("email").notNull(),
   ticketCode: text("ticket_code").notNull(),
-  status: guestStatusEnum("status").notNull().default("confirmed"),
-  checkedIn: boolean("checked_in").notNull().default(false),
-  checkedInAt: timestamp("checked_in_at", { withTimezone: true }),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  status: text("status", { enum: ["confirmed", "waitlisted"] }).notNull().default("confirmed"),
+  checkedIn: integer("checked_in", { mode: "boolean" }).notNull().default(false),
+  checkedInAt: integer("checked_in_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 });
 
 export const insertGuestSchema = createInsertSchema(guestsTable).omit({

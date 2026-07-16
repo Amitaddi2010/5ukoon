@@ -1,7 +1,9 @@
 import { Link } from "wouter";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from "framer-motion";
 import { useListEvents } from "@workspace/api-client-react";
 import { Navbar } from "@/components/Navbar";
+import { useState, useEffect, useRef } from "react";
+import $ from "jquery";
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -9,6 +11,254 @@ const fadeUp = {
   viewport: { once: true, margin: "-60px" },
   transition: { duration: 0.7, ease: [0.25, 0.1, 0.25, 1] },
 };
+
+const splitTextVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i = 1) => ({
+    opacity: 1,
+    y: 0,
+    transition: { staggerChildren: 0.08, delayChildren: 0.04 * i, ease: [0.25, 0.1, 0.25, 1], duration: 0.8 },
+  }),
+};
+
+const wordVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }
+  },
+};
+
+export function AnimatedText({ text, className, delay = 0 }: { text: string, className?: string, delay?: number }) {
+  const lines = text.split("\n");
+  return (
+    <motion.div
+      variants={splitTextVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-40px" }}
+      custom={delay}
+      className={className}
+    >
+      {lines.map((line, lineIndex) => (
+        <span key={lineIndex} className="block">
+          {line.split(" ").map((word, wordIndex) => (
+            <motion.span key={`${lineIndex}-${wordIndex}`} variants={wordVariants} className="inline-block mr-[0.25em]">
+              {word}
+            </motion.span>
+          ))}
+        </span>
+      ))}
+    </motion.div>
+  );
+}
+
+export function AudioPreviewCard() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const togglePlay = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  return (
+    <BentoCard className="md:col-span-2 p-8 md:p-10 flex flex-col justify-between">
+      <div className="absolute inset-0 backdrop-blur-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-[#44cd2b]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+      
+      <div className="relative z-10 w-full flex justify-between items-start">
+        <span className="text-[11px] tracking-[0.2em] text-[var(--accent-gold)] uppercase font-medium">The Vibe</span>
+        <button 
+          onClick={togglePlay}
+          className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300"
+          data-cursor-hover
+        >
+          {isPlaying ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="ml-1"><path d="M8 5v14l11-7z"/></svg>
+          )}
+        </button>
+      </div>
+
+      <div className="relative z-10 mt-6 flex items-end justify-between gap-1 h-12 md:px-4">
+        {[...Array(24)].map((_, i) => (
+          <motion.div 
+            key={i}
+            animate={{ height: isPlaying ? [`${20 + Math.random() * 20}%`, `${60 + Math.random() * 40}%`, `${20 + Math.random() * 20}%`] : "15%" }}
+            transition={{ duration: 0.8 + Math.random(), repeat: Infinity, ease: "easeInOut" }}
+            className="w-1.5 md:w-2 bg-white/20 group-hover:bg-white/40 rounded-t-sm transition-colors"
+          />
+        ))}
+      </div>
+
+      <div className="relative z-10 mt-8">
+        <h3 className="text-2xl md:text-3xl font-display text-white mb-2">Immersive Audio</h3>
+        <p className="text-white/40 text-[13px]">A taste of the soundscapes awaiting you.</p>
+      </div>
+      
+      <audio ref={audioRef} src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop />
+    </BentoCard>
+  );
+}
+
+export function BentoCard({ children, className = "" }: { children: React.ReactNode, className?: string }) {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
+
+  return (
+    <motion.div
+      whileHover={{ scale: 0.98 }}
+      onMouseMove={handleMouseMove}
+      className={`group relative rounded-[32px] bg-white/[0.02] border border-white/[0.05] overflow-hidden ${className}`}
+    >
+      <motion.div
+        className="pointer-events-none absolute -inset-px rounded-[31px] opacity-0 transition duration-300 group-hover:opacity-100 z-0"
+        style={{
+          background: useMotionTemplate`
+            radial-gradient(
+              400px circle at ${mouseX}px ${mouseY}px,
+              rgba(255,255,255,0.06),
+              transparent 80%
+            )
+          `,
+        }}
+      />
+      {children}
+    </motion.div>
+  );
+}
+
+export function SectionPanel({ children, className = "" }: { children: React.ReactNode, className?: string }) {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
+
+  return (
+    <div
+      onMouseMove={handleMouseMove}
+      className={`group relative rounded-[40px] bg-white/[0.02] border border-white/[0.05] overflow-hidden ${className}`}
+    >
+      <motion.div
+        className="pointer-events-none absolute -inset-px rounded-[39px] opacity-0 transition duration-500 group-hover:opacity-100 z-0"
+        style={{
+          background: useMotionTemplate`
+            radial-gradient(
+              600px circle at ${mouseX}px ${mouseY}px,
+              rgba(255,255,255,0.04),
+              transparent 80%
+            )
+          `,
+        }}
+      />
+      <div className="absolute inset-0 backdrop-blur-3xl z-[-1]" />
+      <div className="relative z-10 w-full h-full">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export function ImmersiveWaterBackground() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const initRipples = async () => {
+      // @ts-ignore - expose jQuery globally for the ripples plugin
+      window.jQuery = $;
+      // @ts-ignore
+      window.$ = $;
+      // @ts-ignore
+      await import("jquery.ripples");
+
+      if (!mounted || !containerRef.current) return;
+
+      try {
+        // @ts-ignore
+        $(containerRef.current).ripples({
+          resolution: 512,
+          dropRadius: 25,
+          perturbance: 0.04,
+        });
+      } catch (e) {
+        console.error("Error initializing ripples:", e);
+      }
+    };
+
+    initRipples();
+
+    // Trigger random ripples on scroll to make it immersive
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (!containerRef.current) return;
+          const currentScrollY = window.scrollY;
+          const diff = Math.abs(currentScrollY - lastScrollY);
+          
+          if (diff > 50) {
+            lastScrollY = currentScrollY;
+            const x = window.innerWidth / 2 + (Math.random() - 0.5) * window.innerWidth * 0.8;
+            const y = window.innerHeight / 2 + (Math.random() - 0.5) * window.innerHeight * 0.8;
+            try {
+              // @ts-ignore
+              $(containerRef.current).ripples('drop', x, y, 30 + Math.random() * 30, 0.03 + Math.random() * 0.04);
+            } catch (e) {}
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      mounted = false;
+      window.removeEventListener('scroll', handleScroll);
+      try {
+        if (containerRef.current) {
+          // @ts-ignore
+          $(containerRef.current).ripples('destroy');
+        }
+      } catch (e) {}
+    };
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="fixed inset-0 w-full h-full z-[-1]"
+      style={{
+        backgroundImage: "url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=3000&auto=format&fit=crop')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    />
+  );
+}
 
 export function Home() {
   const { data: events } = useListEvents();
@@ -19,18 +269,55 @@ export function Home() {
     : "August 9, 2026";
 
   return (
-    <div className="bg-black min-h-screen text-white overflow-x-hidden">
+    <div className="min-h-screen text-white overflow-x-hidden relative">
+      <ImmersiveWaterBackground />
       <Navbar />
 
       {/* ─── HERO ─────────────────────────────────────────────── */}
-      <section className="relative h-[100dvh] flex flex-col">
-        {/* Description — lower-center */}
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-[18%] w-full max-w-sm px-6 text-center z-10">
+      <section className="relative h-[100dvh] flex flex-col items-center justify-center overflow-hidden">
+        {/* Dark overlay to make text pop */}
+        <div className="absolute inset-0 bg-black/40 z-0 pointer-events-none" />
+
+        {/* Oversized display heading */}
+        <div className="relative z-10 text-center px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <h1
+              className="text-[18vw] md:text-[14vw] lg:text-[12vw] leading-[0.85] tracking-[-0.03em] text-white select-none pointer-events-none drop-shadow-2xl"
+              style={{ fontFamily: "var(--app-font-display-heavy)" }}
+            >
+              <motion.span
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="inline-block"
+              >
+                SUK
+              </motion.span>
+              <motion.span
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.35 }}
+                className="inline-block relative"
+              >
+                OON
+                {/* Green accent dot */}
+                <span className="absolute -top-[1vw] -right-[3vw]">
+                  <span className="accent-dot-pulse" />
+                </span>
+              </motion.span>
+            </h1>
+          </motion.div>
+
+          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1.2, delay: 0.4 }}
-            className="text-[15px] leading-relaxed text-white/70 font-light"
+            transition={{ duration: 1.2, delay: 0.7 }}
+            className="mt-6 text-[15px] md:text-[16px] leading-relaxed text-white/70 font-light max-w-sm mx-auto pointer-events-none"
           >
             We gather in intimacy, anchor in art,<br />and leave a little lighter.
           </motion.p>
@@ -40,11 +327,11 @@ export function Home() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.6 }}
-          className="absolute bottom-7 left-6 md:left-10 flex flex-col gap-[5px] z-10"
+          transition={{ duration: 1, delay: 0.9 }}
+          className="absolute bottom-7 left-6 md:left-10 flex flex-col gap-[5px] z-10 pointer-events-none"
         >
           {["LIVE MUSIC", "SHAYARI", "STORYTELLING", "GUIDED CIRCLES", "CHANDIGARH, INDIA"].map((tag) => (
-            <span key={tag} className="text-[11px] tracking-[0.14em] text-white/45 uppercase font-medium">
+            <span key={tag} className="text-[11px] tracking-[0.14em] text-white/40 uppercase font-medium">
               {tag}
             </span>
           ))}
@@ -54,12 +341,16 @@ export function Home() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10"
+          transition={{ duration: 1, delay: 1.2 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10 pointer-events-none"
         >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-white/40">
+          <motion.svg
+            animate={{ y: [0, 4, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-white/40"
+          >
             <path d="M7 1v12M1 7l6 6 6-6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+          </motion.svg>
           <span className="text-[11px] tracking-[0.18em] text-white/40 uppercase font-medium">Scroll to explore</span>
         </motion.div>
 
@@ -67,291 +358,248 @@ export function Home() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.8 }}
-          className="absolute bottom-8 right-6 md:right-10 z-10"
+          transition={{ duration: 1, delay: 1 }}
+          className="absolute bottom-8 right-6 md:right-10 z-10 pointer-events-none"
         >
-          <span className="text-[11px] tracking-[0.18em] text-white/40 uppercase font-medium">
+          <span className="text-[11px] tracking-[0.18em] text-white/50 uppercase font-medium flex items-center gap-2">
+            <span className="accent-dot" />
             FEATURED EDITION /01
           </span>
         </motion.div>
       </section>
 
       {/* ─── 01 THE MISSING MIDDLE ────────────────────────────── */}
-      <section id="experience" className="border-t border-white/[0.08] py-28 md:py-36 px-6 md:px-10">
-        <motion.div {...fadeUp} className="max-w-6xl mx-auto grid md:grid-cols-[120px_1fr] gap-12 md:gap-20">
-          <div className="pt-1">
-            <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">01</span>
-          </div>
-          <div>
-            <h2 className="font-display font-normal text-4xl md:text-6xl text-white mb-10 leading-[1.05] tracking-[-0.02em]">
-              The Missing<br />Middle
-            </h2>
-            <div className="grid md:grid-cols-2 gap-10 text-[15px] leading-loose text-white/55 font-light max-w-4xl">
-              <p>
-                Urban life is loud, but it leaves us emotionally constipated. When you need to process, where do you go?
-                Therapy can feel clinical, carrying stigma or high costs. Partying is inherently avoidant, drowning out the feeling rather than sitting with it.
-              </p>
-              <p>
-                Sukoon is the space between. A darbar of vulnerability. For professionals who need to feel deeply without needing to explain themselves.
-                We gather in intimacy, anchor in art, and leave a little lighter.
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ─── 02 THE ARC ───────────────────────────────────────── */}
-      <section id="arc" className="border-t border-white/[0.08] py-28 md:py-36 px-6 md:px-10">
-        <div className="max-w-6xl mx-auto">
-          <motion.div {...fadeUp} className="grid md:grid-cols-[120px_1fr] gap-12 md:gap-20 mb-20">
+      <section id="experience" className="py-20 md:py-32 px-4 md:px-8 max-w-7xl mx-auto">
+        <SectionPanel className="p-10 md:p-20">
+          <motion.div {...fadeUp} className="grid md:grid-cols-[120px_1fr] gap-12 md:gap-20">
             <div className="pt-1">
-              <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">02</span>
+              <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium flex items-center gap-2">
+                <span className="accent-dot" />
+                01
+              </span>
             </div>
             <div>
-              <h2 className="font-display font-normal text-4xl md:text-6xl text-white leading-[1.05] tracking-[-0.02em]">
-                The Evening's<br />Arc (05)
-              </h2>
-              <p className="mt-6 text-[14px] text-white/45 tracking-wide font-light">
-                A carefully paced journey through five movements.
-              </p>
+              <AnimatedText 
+                text={"The Missing\nMiddle"} 
+                className="font-display font-normal text-4xl md:text-6xl text-white mb-10 leading-[1.05] tracking-[-0.02em]" 
+              />
+              <div className="grid md:grid-cols-2 gap-10 text-[15px] leading-loose text-white/55 font-light max-w-4xl">
+                <p>
+                  Urban life is loud, but it leaves us emotionally constipated. When you need to process, where do you go?
+                  Therapy can feel clinical, carrying stigma or high costs. Partying is inherently avoidant, drowning out the feeling rather than sitting with it.
+                </p>
+                <p>
+                  Sukoon is the space between. A darbar of vulnerability. For professionals who need to feel deeply without needing to explain themselves.
+                  We gather in intimacy, anchor in art, and leave a little lighter.
+                </p>
+              </div>
             </div>
           </motion.div>
-
-          <div className="md:pl-[140px]">
-            {[
-              { num: "01", title: "AAGAZ", sub: "Arrival & Decompression", desc: "The transition from the noise of the day into the warmth of the room." },
-              { num: "02", title: "SUR", sub: "Live Concert & Release", desc: "Music as the vessel to unthaw the edges of the mind." },
-              { num: "03", title: "ALFAAZ", sub: "Shayari & Spoken Word", desc: "Giving vocabulary to what sits unspoken." },
-              { num: "04", title: "KAHAANI", sub: "Story Circles", desc: "Guided sharing, witnessed deeply, without unsolicited advice." },
-              { num: "05", title: "SUKOON", sub: "Return to Lightness", desc: "The lingering warmth before we step back into the city." },
-            ].map((phase, i) => (
-              <motion.div
-                key={phase.title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.5, delay: i * 0.07 }}
-                className="border-t border-white/[0.08] py-7 flex items-start md:items-center gap-8 group"
-              >
-                <span className="text-[11px] tracking-[0.15em] text-white/20 font-medium min-w-[28px] mt-1 md:mt-0">
-                  {phase.num}
-                </span>
-                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-10 flex-1">
-                  <h3 className="font-display font-normal text-[15px] tracking-[0.1em] text-white min-w-[100px]">
-                    {phase.title}
-                  </h3>
-                  <span className="text-[13px] text-white/40 font-light min-w-[220px]">{phase.sub}</span>
-                  <p className="text-[14px] text-white/55 font-light leading-relaxed">{phase.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-            <div className="border-t border-white/[0.08]" />
-          </div>
-        </div>
+        </SectionPanel>
       </section>
 
-      {/* ─── 03 WHY IT WORKS ──────────────────────────────────── */}
-      <section className="border-t border-white/[0.08] py-28 md:py-36 px-6 md:px-10">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-[120px_1fr] gap-12 md:gap-20">
-          <motion.div {...fadeUp} className="pt-1">
-            <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">03</span>
+      {/* ─── 02 THE BENTO EXPERIENCE ────────────────────────────── */}
+      <section id="experience-grid" className="py-20 md:py-32 px-4 md:px-8 max-w-[1400px] mx-auto">
+        <div className="relative z-10">
+          <motion.div {...fadeUp} className="mb-16 md:mb-24 flex flex-col items-center text-center">
+             <span className="text-[11px] tracking-[0.2em] text-[var(--accent-gold)] uppercase font-medium flex items-center gap-2 mb-6">
+               <span className="accent-dot" />
+               02
+             </span>
+             <AnimatedText 
+               text="The Sukoon Experience" 
+               className="font-display font-normal text-4xl md:text-6xl text-white tracking-[-0.02em] leading-tight" 
+             />
+             <p className="mt-6 text-white/50 text-[15px] font-light max-w-lg mx-auto">
+               An evening carefully curated to anchor you in art, transitioning from the noise of the day into the warmth of a shared room.
+             </p>
           </motion.div>
-          <div className="grid md:grid-cols-2 gap-16">
-            <motion.div {...fadeUp}>
-              <h2 className="font-display font-normal text-3xl md:text-5xl text-white mb-10 leading-[1.05] tracking-[-0.02em]">
-                Why It Works
-              </h2>
-              <div className="space-y-8">
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[300px] md:auto-rows-[400px]">
+          
+          {/* Card 1: Artist Lineup (Span 2 cols) */}
+          <BentoCard className="md:col-span-2">
+             {/* Background glow on hover */}
+             <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-gold)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+             <div className="absolute inset-0 backdrop-blur-3xl" />
+             
+             <div className="p-10 md:p-12 h-full flex flex-col justify-end relative z-10 pointer-events-none">
+               <h3 className="text-3xl md:text-5xl font-display text-white mb-3">The Artists</h3>
+               <p className="text-white/50 text-[14px] max-w-md">
+                 Hindustani classical renditions by Chetan Thakur & spoken word poetry that gives vocabulary to what sits unspoken.
+               </p>
+             </div>
+             {/* Inner image zooming on hover */}
+             <div className="absolute top-0 right-0 w-full md:w-2/3 h-full pointer-events-none">
+               <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/50 to-transparent z-10 hidden md:block" />
+               <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/50 to-transparent z-10 md:hidden" />
+               <img 
+                 src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2000&auto=format&fit=crop" 
+                 className="w-full h-full object-cover opacity-20 group-hover:opacity-40 group-hover:scale-105 transition-all duration-[1.5s] ease-out" 
+                 alt="Artists" 
+               />
+             </div>
+          </BentoCard>
+
+          {/* Card 2: Venue & Location */}
+          <BentoCard className="p-8 md:p-10">
+            <div className="absolute inset-0 backdrop-blur-3xl bg-white/[0.01]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.05),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            <div className="relative z-10 h-full flex flex-col justify-between pointer-events-none">
+              <div className="w-14 h-14 rounded-full bg-white/[0.05] border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:border-[var(--accent-gold)]/30 group-hover:text-[var(--accent-gold)] transition-all duration-500">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/70 group-hover:text-[var(--accent-gold)] transition-colors">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-2xl font-display text-white mb-2">{nextEvent?.city ?? "Chandigarh, IN"}</h3>
+                <p className="text-white/40 text-[13px] leading-relaxed">
+                  An intimate, secret venue.<br />Exact location revealed upon RSVP.
+                </p>
+              </div>
+            </div>
+          </BentoCard>
+
+          {/* Card 3: The Arc */}
+          <BentoCard className="p-8 md:p-10">
+            <div className="absolute inset-0 backdrop-blur-3xl" />
+            <div className="relative z-10 h-full flex flex-col justify-between pointer-events-none">
+              <div className="flex flex-col gap-3">
                 {[
-                  { label: "Progressive Vulnerability", body: "We don't start with sharing. We start with art. Music softens the guard." },
-                  { label: "20–30 Person Intimacy", body: "Small enough to feel seen, large enough to blend in if you choose." },
-                  { label: "Cultural Fluency", body: "Shayari and Hindustani music provide an ancestral container for melancholy." },
-                ].map((item) => (
-                  <div key={item.label} className="border-t border-white/[0.08] pt-6">
-                    <p className="text-[13px] tracking-[0.1em] uppercase text-white font-medium mb-2">{item.label}</p>
-                    <p className="text-[14px] text-white/50 font-light leading-relaxed">{item.body}</p>
+                  { n: "01", t: "AAGAZ" }, 
+                  { n: "02", t: "SUR" }, 
+                  { n: "03", t: "ALFAAZ" }, 
+                  { n: "04", t: "KAHAANI" }, 
+                  { n: "05", t: "SUKOON" }
+                ].map((phase, i) => (
+                  <div key={phase.n} className="flex items-center gap-4 opacity-40 group-hover:opacity-100 transition-opacity duration-500" style={{ transitionDelay: `${i * 70}ms` }}>
+                    <span className="text-[10px] tracking-[0.2em] font-medium text-[var(--accent-gold)]">{phase.n}</span>
+                    <span className="text-[11px] tracking-[0.1em] text-white">{phase.t}</span>
                   </div>
                 ))}
               </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.15 }}
-            >
-              <h2 className="font-display font-normal text-3xl md:text-5xl text-white mb-10 leading-[1.05] tracking-[-0.02em]">
-                Safety & Norms
-              </h2>
-              <div className="space-y-6 text-[14px] text-white/55 font-light leading-relaxed">
-                <p>This is <span className="text-white font-medium">not therapy</span>, and it is not a replacement for professional care.</p>
-                <p>When we share, we practice <span className="text-white font-medium">witnessing</span>. No advice-giving, no fixing. We simply hold space.</p>
-                <p>All sharing is <span className="text-white font-medium">consent-based</span>. You are welcome to remain silent the entire evening.</p>
-                <p>What is shared in the room, stays in the room.</p>
+              <div className="mt-6">
+                <h3 className="text-2xl font-display text-white mb-2">The Arc</h3>
+                <p className="text-white/40 text-[13px]">Five movements of vulnerability.</p>
               </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 04 NEXT EDITION ──────────────────────────────────── */}
-      <section id="edition" className="border-t border-white/[0.08] py-28 md:py-36 px-6 md:px-10">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-[120px_1fr] gap-12 md:gap-20">
-          <motion.div {...fadeUp} className="pt-1">
-            <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">04</span>
-          </motion.div>
-          <motion.div {...fadeUp}>
-            <p className="text-[11px] tracking-[0.18em] text-white/30 uppercase mb-6 font-medium">Next Edition</p>
-            <h2 className="font-display font-normal text-4xl md:text-7xl text-white mb-16 leading-[1.0] tracking-[-0.02em]">
-              {nextEvent?.title ?? "Sukoon: Edition I"}
-            </h2>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border border-white/[0.1] mb-14">
-              {[
-                { label: "DATE", value: eventDate },
-                { label: "CITY", value: nextEvent?.city ?? "Chandigarh" },
-                { label: "SEATS", value: "Limited to 25" },
-                { label: "ENTRY", value: `₹${nextEvent?.price ?? "1,499"}` },
-              ].map((item, i) => (
-                <div
-                  key={item.label}
-                  className={`p-6 md:p-8 ${i < 3 ? "border-r border-white/[0.1]" : ""}`}
-                >
-                  <p className="text-[10px] tracking-[0.2em] text-white/30 uppercase mb-3 font-medium">{item.label}</p>
-                  <p className="text-[15px] text-white font-medium">{item.value}</p>
-                </div>
-              ))}
             </div>
+          </BentoCard>
 
-            <Link
-              href="/request"
-              className="inline-flex items-center gap-3 px-8 h-12 border border-white rounded-full text-[13px] tracking-[0.1em] uppercase font-medium text-white hover:bg-white hover:text-black transition-all duration-300"
-            >
-              Request an Invitation
-              <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
-                <path d="M1 5h14M11 1l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </Link>
-            <p className="mt-5 text-[12px] text-white/30 font-light tracking-wide">
-              Applications reviewed on a rolling basis to curate a balanced room.
-            </p>
-          </motion.div>
+          {/* Card 4: Audio Preview (Span 2 cols) */}
+          <AudioPreviewCard />
+
+          {/* Card 5: Tickets & Call to Action (Span 2 cols) */}
+          <BentoCard className="md:col-span-2 p-10 md:p-12 flex flex-col justify-between items-start">
+             <div className="absolute inset-0 bg-gradient-to-t from-[var(--accent-gold)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+             <div className="absolute inset-0 backdrop-blur-3xl" />
+             
+             <div className="relative z-10 w-full flex justify-between items-start">
+               <span className="text-[11px] tracking-[0.2em] text-[var(--accent-gold)] uppercase font-medium">Next Edition</span>
+               <span className="text-[11px] tracking-[0.2em] text-white/50 uppercase font-medium border border-white/10 px-3 py-1 rounded-full">25 Seats Only</span>
+             </div>
+             
+             <div className="relative z-10 mt-auto w-full flex flex-col md:flex-row md:items-end justify-between gap-8">
+               <div>
+                 <AnimatedText text="Reserve your spot at Sukoon" className="text-4xl md:text-5xl font-display text-white mb-3 tracking-[-0.02em] leading-tight" delay={1} />
+                 <p className="text-white/40 text-[13px]">
+                   Applications reviewed on a rolling basis. Entry: ₹{nextEvent?.price ?? "1,499"}
+                 </p>
+               </div>
+               
+               <Link 
+                 href="/request" 
+                 className="inline-flex items-center gap-3 px-8 h-14 bg-white text-black rounded-full text-[12px] tracking-[0.15em] uppercase font-semibold hover:bg-[var(--accent-gold)] hover:scale-105 transition-all duration-300 shrink-0"
+                 data-cursor-hover
+               >
+                 Request Invitation
+                 <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+                   <path d="M1 5h14M11 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                 </svg>
+               </Link>
+             </div>
+          </BentoCard>
+
         </div>
-      </section>
-
-      {/* ─── 05 THE CURATORS ──────────────────────────────────── */}
-      <section className="border-t border-white/[0.08] py-28 md:py-36 px-6 md:px-10">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-[120px_1fr] gap-12 md:gap-20">
-          <motion.div {...fadeUp} className="pt-1">
-            <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">05</span>
-          </motion.div>
-          <motion.div {...fadeUp} className="w-full">
-            <h2 className="font-display font-normal text-4xl md:text-6xl text-white mb-16 leading-[1.05] tracking-[-0.02em]">
-              The Curators (03)
-            </h2>
-            <div className="w-full">
-              {[
-                { name: "Amit Raj Saraswat", role: "Concept & Host", desc: "Holds the container. Facilitates the transitions between performance and vulnerability." },
-                { name: "Chetan Thakur", role: "Performing Artist", desc: "Anchors the evening with Hindustani classical and semi-classical renditions." },
-                { name: "Sanya Verma", role: "Experience Director", desc: "Architects the sensory environment — from the warmth of the lighting to the flow of the room." },
-              ].map((person, i) => (
-                <motion.div
-                  key={person.name}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.08 }}
-                  className="border-t border-white/[0.08] py-7 flex flex-col md:flex-row md:items-center gap-4 md:gap-0 group"
-                >
-                  <h3 className="font-display font-normal text-[22px] md:text-[26px] text-white tracking-[-0.01em] flex-[2]">
-                    {person.name}
-                  </h3>
-                  <p className="text-[12px] tracking-[0.14em] text-white/35 uppercase font-medium flex-1">
-                    {person.role}
-                  </p>
-                  <p className="text-[14px] text-white/50 font-light leading-relaxed flex-[2]">
-                    {person.desc}
-                  </p>
-                </motion.div>
-              ))}
-              <div className="border-t border-white/[0.08]" />
-            </div>
-          </motion.div>
         </div>
       </section>
 
       {/* ─── 06 VOICES FROM THE ROOM ──────────────────────────── */}
-      <section className="border-t border-white/[0.08] py-28 md:py-36 px-6 md:px-10">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-[120px_1fr] gap-12 md:gap-20">
-          <motion.div {...fadeUp} className="pt-1">
-            <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">06</span>
-          </motion.div>
-          <motion.div {...fadeUp} className="w-full">
-            <h2 className="font-display font-normal text-4xl md:text-6xl text-white mb-16 leading-[1.05] tracking-[-0.02em]">
-              Voices from<br />the Room
-            </h2>
-            <div className="grid md:grid-cols-3 gap-0">
-              {[
-                { quote: "I didn't realize how much I was holding onto until the music started. For the first time in months, I just exhaled.", author: "A professional from Chandigarh" },
-                { quote: "It's not a party, and it's not a clinic. It's just human beings being human together. Incredibly rare.", author: "Previous Attendee" },
-                { quote: "The way the evening is structured makes you feel completely safe. You can share your soul or say nothing at all.", author: "A founder from Tricity" },
-              ].map((t, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className={`p-8 md:p-10 flex flex-col ${i < 2 ? "md:border-r border-white/[0.08]" : ""} border-t border-white/[0.08] md:border-t-0`}
-                >
-                  <p className="font-serif text-[16px] text-white/70 leading-loose flex-1 mb-8 italic">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                  <p className="text-[11px] tracking-[0.15em] text-white/30 uppercase font-medium">
-                    — {t.author}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+      <section className="py-20 md:py-32 px-4 md:px-8 max-w-7xl mx-auto">
+        <SectionPanel className="p-10 md:p-20">
+          <div className="grid md:grid-cols-[120px_1fr] gap-12 md:gap-20">
+            <motion.div {...fadeUp} className="pt-1">
+              <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium flex items-center gap-2">
+                <span className="accent-dot" />
+                06
+              </span>
+            </motion.div>
+            <motion.div {...fadeUp} className="w-full">
+              <AnimatedText 
+                text={"Voices from\nthe Room"} 
+                className="font-display font-normal text-4xl md:text-6xl text-white mb-16 leading-[1.05] tracking-[-0.02em]" 
+              />
+              <div className="grid md:grid-cols-3 gap-0">
+                {[
+                  { q: "I haven't felt this seen in a room full of strangers in years.", a: "Founder, 32" },
+                  { q: "It's like therapy, but set to a soundtrack that understands you.", a: "Creative Director, 28" },
+                  { q: "A rare pocket of genuine intimacy in an otherwise noisy city.", a: "Architect, 35" }
+                ].map((item, i) => (
+                  <div key={i} className={`p-8 md:p-10 border border-white/[0.05] ${i !== 0 ? 'border-t-0 md:border-t md:border-l-0' : ''}`}>
+                    <p className="font-serif text-xl italic text-white/80 leading-relaxed mb-6">"{item.q}"</p>
+                    <p className="text-[12px] uppercase tracking-widest text-[var(--accent-gold)]">{item.a}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </SectionPanel>
       </section>
 
       {/* ─── 07 FAQ ───────────────────────────────────────────── */}
-      <section className="border-t border-white/[0.08] py-28 md:py-36 px-6 md:px-10">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-[120px_1fr] gap-12 md:gap-20">
-          <motion.div {...fadeUp} className="pt-1">
-            <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">07</span>
-          </motion.div>
-          <motion.div {...fadeUp} className="w-full">
-            <h2 className="font-display font-normal text-4xl md:text-6xl text-white mb-16 leading-[1.05] tracking-[-0.02em]">
-              Common<br />Inquiries
-            </h2>
-            <div className="w-full max-w-3xl">
-              {[
-                { q: "Is this therapy?", a: "No. Sukoon is a cultural and emotional gathering, not a clinical one. While it can be deeply therapeutic, it is not a replacement for professional mental health support." },
-                { q: "Do I have to share anything personal?", a: "Absolutely not. You are welcome to simply listen, absorb the art, and witness others. Silence is a fully respected form of participation here." },
-                { q: "Can I bring a friend?", a: "Yes, but we ask that both of you apply separately so we understand why each person wants to attend. Intimacy works best when everyone has individual intent." },
-                { q: "Is this a religious event?", a: "No. We use cultural tools — like shayari and semi-classical music — but the space is strictly secular and welcoming to people of all backgrounds and beliefs." },
-                { q: "What happens after I request an invite?", a: "We review requests to ensure the room has a balanced mix. We will reach out within 48 hours to confirm your seat, after which you can complete the payment." },
-              ].map((item, i) => (
-                <FAQItem key={i} q={item.q} a={item.a} />
-              ))}
-            </div>
-          </motion.div>
-        </div>
+      <section className="py-20 md:py-32 px-4 md:px-8 max-w-7xl mx-auto mb-20">
+        <SectionPanel className="p-10 md:p-20">
+          <div className="grid md:grid-cols-[120px_1fr] gap-12 md:gap-20">
+            <motion.div {...fadeUp} className="pt-1">
+              <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium flex items-center gap-2">
+                <span className="accent-dot" />
+                07
+              </span>
+            </motion.div>
+            <motion.div {...fadeUp} className="w-full">
+              <AnimatedText 
+                text={"Common\nInquiries"} 
+                className="font-display font-normal text-4xl md:text-6xl text-white mb-16 leading-[1.05] tracking-[-0.02em]" 
+              />
+              <div className="w-full max-w-3xl">
+                {[
+                  { q: "Is this therapy?", a: "No. Sukoon is a cultural and emotional gathering, not a clinical one. While it can be deeply therapeutic, it is not a replacement for professional mental health support." },
+                  { q: "Do I have to share anything personal?", a: "Absolutely not. You are welcome to simply listen, absorb the art, and witness others. Silence is a fully respected form of participation here." },
+                  { q: "Can I bring a friend?", a: "Yes, but we ask that both of you apply separately so we understand why each person wants to attend. Intimacy works best when everyone has individual intent." },
+                  { q: "Is this a religious event?", a: "No. We use cultural tools — like shayari and semi-classical music — but the space is strictly secular and welcoming to people of all backgrounds and beliefs." },
+                  { q: "What happens after I request an invite?", a: "We review requests to ensure the room has a balanced mix. We will reach out within 48 hours to confirm your seat, after which you can complete the payment." },
+                ].map((item, i) => (
+                  <FAQItem key={i} q={item.q} a={item.a} />
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </SectionPanel>
       </section>
 
       {/* ─── FOOTER ───────────────────────────────────────────── */}
       <footer id="contact" className="border-t border-white/[0.08] px-6 md:px-10 py-8">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <span className="font-display text-[15px] tracking-[0.14em] uppercase text-white">SUKOON©</span>
+          <span className="font-display text-[15px] tracking-[0.14em] uppercase text-white flex items-center gap-2">
+            <span className="accent-dot" />
+            SUKOON©
+          </span>
 
           <div className="flex items-center gap-8">
-            <a href="#" className="text-[12px] text-white/40 hover:text-white transition-colors tracking-wide">Instagram</a>
-            <a href="#" className="text-[12px] text-white/40 hover:text-white transition-colors tracking-wide">WhatsApp</a>
-            <a href="mailto:hello@sukoon.com" className="text-[12px] text-white/40 hover:text-white transition-colors tracking-wide">Contact</a>
+            <a href="#" className="text-[12px] text-white/40 hover:text-[var(--accent-gold)] transition-colors tracking-wide" data-cursor-hover>Instagram</a>
+            <a href="#" className="text-[12px] text-white/40 hover:text-[var(--accent-gold)] transition-colors tracking-wide" data-cursor-hover>WhatsApp</a>
+            <a href="mailto:hello@sukoon.com" className="text-[12px] text-white/40 hover:text-[var(--accent-gold)] transition-colors tracking-wide" data-cursor-hover>Contact</a>
           </div>
 
           <p className="text-[11px] text-white/20 tracking-wide font-light">
@@ -370,20 +618,32 @@ function FAQItem({ q, a }: { q: string; a: string }) {
       <button
         onClick={() => setOpen(v => !v)}
         className="w-full flex items-start justify-between gap-6 py-6 text-left group"
+        data-cursor-hover
       >
         <span className="text-[15px] font-medium text-white leading-snug">{q}</span>
-        <span className="text-white/40 text-xl leading-none mt-0.5 group-hover:text-white transition-colors shrink-0">
-          {open ? "−" : "+"}
-        </span>
+        <motion.span
+          animate={{ rotate: open ? 45 : 0 }}
+          transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+          className="text-white/40 text-xl leading-none mt-0.5 group-hover:text-[var(--accent-gold)] transition-colors shrink-0"
+        >
+          +
+        </motion.span>
       </button>
-      {open && (
-        <div className="pb-6">
-          <p className="text-[14px] text-white/50 font-light leading-relaxed">{a}</p>
-        </div>
-      )}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+            className="faq-content"
+          >
+            <div className="pb-6">
+              <p className="text-[14px] text-white/50 font-light leading-relaxed">{a}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
-
-// Need useState import
-import { useState } from "react";

@@ -1,21 +1,19 @@
-import { pgTable, serial, text, integer, numeric, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { sqliteTable, integer, text, real } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
-export const eventStatusEnum = pgEnum("event_status", ["upcoming", "past", "cancelled"]);
-
-export const eventsTable = pgTable("events", {
-  id: serial("id").primaryKey(),
+export const eventsTable = sqliteTable("events", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
   editionNumber: integer("edition_number").notNull(),
-  date: timestamp("date", { withTimezone: true }).notNull(),
+  date: integer("date", { mode: "timestamp" }).notNull(),
   city: text("city").notNull(),
   venue: text("venue"),
   capacity: integer("capacity").notNull().default(25),
-  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
-  status: eventStatusEnum("status").notNull().default("upcoming"),
+  price: real("price").notNull(),
+  status: text("status", { enum: ["upcoming", "past", "cancelled"] }).notNull().default("upcoming"),
   rsvpLink: text("rsvp_link"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 });
 
 export const insertEventSchema = createInsertSchema(eventsTable).omit({ id: true, createdAt: true });

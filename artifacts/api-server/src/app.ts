@@ -37,10 +37,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const sessionSecret = process.env.SESSION_SECRET;
-if (!sessionSecret) {
-  throw new Error("SESSION_SECRET environment variable is required");
-}
+const sessionSecret = process.env.SESSION_SECRET || "sukoon-local-dev-secret-2026";
 
 app.use(
   session({
@@ -55,6 +52,19 @@ app.use(
   })
 );
 
+import path from "path";
+
 app.use("/api", router);
+
+// Serve the compiled frontend static files
+const frontendPath = process.env.NODE_ENV === "production" 
+  ? path.resolve(__dirname, "public") 
+  : path.resolve(__dirname, "../../sukoon/dist/public");
+app.use(express.static(frontendPath));
+
+// Fallback all other routes to index.html for client-side routing
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(frontendPath, "index.html"));
+});
 
 export default app;

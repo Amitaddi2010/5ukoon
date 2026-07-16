@@ -29,6 +29,7 @@ const stepVariants = {
   animate: { opacity: 1, x: 0 },
   exit: { opacity: 0, x: -20 },
 };
+const stepTransition = { type: "spring" as const, damping: 25, stiffness: 300, mass: 0.8 };
 
 export function RequestForm() {
   const [step, setStep] = useState(1);
@@ -113,8 +114,8 @@ export function RequestForm() {
       {/* Progress bar */}
       <div className="fixed top-[52px] left-0 right-0 z-40 h-[1px] bg-white/[0.06]">
         <div
-          className="h-full bg-white/60 transition-all duration-500 ease-in-out"
-          style={{ width: `${(step / 5) * 100}%` }}
+          className="h-full transition-all duration-500 ease-in-out"
+          style={{ width: `${(step / 5) * 100}%`, backgroundColor: 'var(--accent-gold)' }}
         />
       </div>
 
@@ -128,7 +129,8 @@ export function RequestForm() {
               </svg>
               Cancel
             </Link>
-            <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium">
+            <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium flex items-center gap-2">
+              <span className="accent-dot" />
               Step {step} / 05
             </span>
           </div>
@@ -138,7 +140,7 @@ export function RequestForm() {
               <AnimatePresence mode="wait">
 
                 {step === 1 && (
-                  <motion.div key="s1" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.35 }} className="space-y-10">
+                  <motion.div key="s1" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={stepTransition} className="space-y-10">
                     <div>
                       <p className="text-[11px] tracking-[0.2em] text-white/25 uppercase mb-4 font-medium">Identity</p>
                       <h2 className="text-3xl md:text-4xl font-medium text-white tracking-tight">Who is requesting?</h2>
@@ -147,7 +149,7 @@ export function RequestForm() {
                       <FormItem>
                         <FormLabel className="text-[11px] tracking-[0.15em] text-white/35 uppercase font-medium">Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Aman Sharma" className="h-12 bg-transparent border-0 border-b border-white/15 rounded-none text-white text-[16px] px-0 focus-visible:ring-0 focus-visible:border-white/50 placeholder:text-white/20 font-light" {...field} />
+                          <Input placeholder="Aman Sharma" className="h-12 bg-transparent border-0 border-b border-white/15 rounded-none text-white text-[16px] px-0 focus-visible:ring-0 focus-visible:border-[var(--accent-gold)] placeholder:text-white/20 font-light" {...field} />
                         </FormControl>
                         <FormMessage className="text-[12px] text-red-400" />
                       </FormItem>
@@ -165,7 +167,7 @@ export function RequestForm() {
                 )}
 
                 {step === 2 && (
-                  <motion.div key="s2" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.35 }} className="space-y-10">
+                  <motion.div key="s2" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={stepTransition} className="space-y-10">
                     <div>
                       <p className="text-[11px] tracking-[0.2em] text-white/25 uppercase mb-4 font-medium">Contact</p>
                       <h2 className="text-3xl md:text-4xl font-medium text-white tracking-tight">Digital footprint</h2>
@@ -192,7 +194,7 @@ export function RequestForm() {
                 )}
 
                 {step === 3 && (
-                  <motion.div key="s3" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.35 }} className="space-y-10">
+                  <motion.div key="s3" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={stepTransition} className="space-y-10">
                     <div>
                       <p className="text-[11px] tracking-[0.2em] text-white/25 uppercase mb-4 font-medium">Discovery</p>
                       <h2 className="text-3xl md:text-4xl font-medium text-white tracking-tight">How did you find us?</h2>
@@ -220,7 +222,7 @@ export function RequestForm() {
                 )}
 
                 {step === 4 && (
-                  <motion.div key="s4" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.35 }} className="space-y-10">
+                  <motion.div key="s4" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={stepTransition} className="space-y-10">
                     <div>
                       <p className="text-[11px] tracking-[0.2em] text-white/25 uppercase mb-4 font-medium">Connection</p>
                       <h2 className="text-3xl md:text-4xl font-medium text-white tracking-tight">Familiar faces</h2>
@@ -241,7 +243,7 @@ export function RequestForm() {
                 )}
 
                 {step === 5 && (
-                  <motion.div key="s5" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.35 }} className="space-y-10">
+                  <motion.div key="s5" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={stepTransition} className="space-y-10">
                     <div>
                       <p className="text-[11px] tracking-[0.2em] text-white/25 uppercase mb-4 font-medium">Intention</p>
                       <h2 className="text-3xl md:text-4xl font-medium text-white tracking-tight">The most important question</h2>
@@ -294,7 +296,9 @@ export function RequestForm() {
                   <button
                     type="submit"
                     disabled={createRequest.isPending}
-                    className="flex items-center gap-3 px-7 h-10 bg-white text-black rounded-full text-[12px] tracking-[0.1em] uppercase font-medium hover:bg-white/90 transition-all duration-200 disabled:opacity-40"
+                    className="flex items-center gap-3 px-7 h-10 text-black rounded-full text-[12px] tracking-[0.1em] uppercase font-medium hover:brightness-110 transition-all duration-200 disabled:opacity-40"
+                    style={{ backgroundColor: 'var(--accent-gold)' }}
+                    data-cursor-hover
                   >
                     {createRequest.isPending ? "Submitting..." : "Submit Request"}
                   </button>
