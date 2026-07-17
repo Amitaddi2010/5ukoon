@@ -61630,6 +61630,36 @@ router2.get("/events", async (req, res) => {
     return res.status(500).json({ error: "Internal server error", message: err.message, stack: err.stack });
   }
 });
+router2.get("/debug-db", async (req, res) => {
+  try {
+    const fs = __require("fs");
+    const path3 = __require("path");
+    const dbPath = path3.resolve(process.cwd(), "sqlite.db");
+    let exists2 = false;
+    let size = 0;
+    let perms = "";
+    try {
+      const stat = fs.statSync(dbPath);
+      exists2 = true;
+      size = stat.size;
+      perms = (stat.mode & parseInt("777", 8)).toString(8);
+    } catch (e) {
+    }
+    let querySuccess = false;
+    let queryError = null;
+    let queryCause = null;
+    try {
+      await db.select().from(eventsTable).limit(1);
+      querySuccess = true;
+    } catch (err) {
+      queryError = err.message;
+      queryCause = err.cause ? err.cause.message : null;
+    }
+    return res.json({ cwd: process.cwd(), dbPath, exists: exists2, size, perms, querySuccess, queryError, queryCause });
+  } catch (err) {
+    return res.status(500).json({ error: "Debug endpoint crashed", message: err.message });
+  }
+});
 router2.get("/events/:id", async (req, res) => {
   const id = Number(req.params.id);
   if (!id) return res.status(400).json({ error: "Invalid id" });
