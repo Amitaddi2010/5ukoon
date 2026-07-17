@@ -491,26 +491,27 @@ export function Home() {
           <AudioPreviewCard />
 
           {/* Card 5: Tickets & Call to Action (Span 2 cols) */}
-          <BentoCard className="md:col-span-2 p-10 md:p-12 flex flex-col justify-between items-start">
+          <BentoCard className="md:col-span-2 p-8 sm:p-10 md:p-12 flex flex-col justify-between items-start">
              <div className="absolute inset-0 bg-gradient-to-t from-[var(--accent-gold)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
              <div className="absolute inset-0 backdrop-blur-3xl" />
              
-             <div className="relative z-10 w-full flex justify-between items-start">
-               <span className="text-[11px] tracking-[0.2em] text-[var(--accent-gold)] uppercase font-medium">Next Edition</span>
-               <span className="text-[11px] tracking-[0.2em] text-white/50 uppercase font-medium border border-white/10 px-3 py-1 rounded-full">25 Seats Only</span>
+             <div className="relative z-10 w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+               <span className="text-[10px] sm:text-[11px] tracking-[0.2em] text-[var(--accent-gold)] uppercase font-medium">Next Edition</span>
+               <span className="text-[10px] sm:text-[11px] tracking-[0.2em] text-white/50 uppercase font-medium border border-white/10 px-3 py-1 rounded-full">25 Seats Only</span>
              </div>
              
-             <div className="relative z-10 mt-auto w-full flex flex-col md:flex-row md:items-end justify-between gap-8">
-               <div>
-                 <AnimatedText text="Reserve your spot at Sukoon" className="text-4xl md:text-5xl font-display text-white mb-3 tracking-[-0.02em] leading-tight" delay={1} />
-                 <p className="text-white/40 text-[13px]">
-                   Applications reviewed on a rolling basis. Entry: ₹{nextEvent?.price ?? "1,499"}
+             <div className="relative z-10 mt-12 sm:mt-auto w-full flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+               <div className="max-w-xl">
+                 <AnimatedText text="Reserve your spot at Sukoon" className="text-3xl sm:text-4xl md:text-5xl font-display text-white mb-4 tracking-[-0.02em] leading-tight" delay={1} />
+                 <p className="text-white/50 text-[13px] sm:text-[14px] leading-relaxed">
+                   Applications reviewed on a rolling basis. <br className="hidden sm:block" />
+                   <span className="text-white/90 font-medium">Entry: ₹{nextEvent?.price ?? "299"}</span>
                  </p>
                </div>
                
                <Link 
                  href="/request" 
-                 className="inline-flex items-center gap-3 px-8 h-14 bg-white text-black rounded-full text-[12px] tracking-[0.15em] uppercase font-semibold hover:bg-[var(--accent-gold)] hover:scale-105 transition-all duration-300 shrink-0"
+                 className="inline-flex items-center justify-center w-full lg:w-auto gap-3 px-8 h-12 sm:h-14 bg-white text-black rounded-full text-[11px] sm:text-[12px] tracking-[0.15em] uppercase font-semibold hover:bg-[var(--accent-gold)] hover:scale-[1.02] transition-all duration-300 shrink-0"
                  data-cursor-hover
                >
                  Request Invitation
