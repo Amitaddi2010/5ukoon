@@ -114,13 +114,6 @@ startApp();
 `;
 fs.writeFileSync(path.resolve(deployDir, 'app.js'), appJsContent);
 
-const htaccessContent = `Options -MultiViews
-PassengerEnabled On
-PassengerAppType node
-PassengerStartupFile app.js
-`;
-fs.writeFileSync(path.resolve(deployDir, '.htaccess'), htaccessContent);
-
 console.log("✅ Successfully packaged for Hostinger!");
 console.log("📁 The 'deploy' folder has been created at:", deployDir);
 console.log("");
