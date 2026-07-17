@@ -39,7 +39,7 @@ const pkgJson = {
   version: "1.0.0",
   type: "module",
   scripts: {
-    start: "NODE_ENV=production node app.js",
+    start: "NODE_ENV=production node app.cjs",
     build: "echo 'Already built! Skipping build step for Hostinger...'"
   },
   dependencies: {
@@ -54,16 +54,24 @@ fs.writeFileSync(
   JSON.stringify(pkgJson, null, 2)
 );
 
-// 3.5 Create app.js wrapper for Hostinger (Passenger prefers app.js)
+// 3.5 Create app.cjs wrapper for Hostinger (Passenger's loader uses require(), which fails on ES Modules)
 fs.writeFileSync(
-  path.resolve(deployDir, 'app.js'),
-  `import './index.mjs';\n`
+  path.resolve(deployDir, 'app.cjs'),
+  `// Passenger uses require(), which crashes on ES modules.
+// This CommonJS wrapper dynamically imports your ES module app.
+async function startApp() {
+  await import('./index.mjs');
+}
+startApp().catch(err => {
+  console.error("Failed to start app:", err);
+});
+`
 );
 
 // 3.6 Create default .htaccess for Hostinger Node.js to prevent 403 Forbidden
 const htaccessContent = `# DO NOT REMOVE. ALREADY CONFIGURED ON HOSTINGER.
 PassengerAppType node
-PassengerStartupFile app.js
+PassengerStartupFile app.cjs
 `;
 fs.writeFileSync(path.resolve(deployDir, '.htaccess'), htaccessContent);
 
@@ -77,7 +85,7 @@ ADMIN_PASSWORD=your_secure_password_here
 `;
 fs.writeFileSync(path.resolve(deployDir, '.env'), envFile);
 
-// We will rely on app.js as the entry point for Hostinger's Node.js App.
+// We will rely on app.cjs as the entry point for Hostinger's Node.js App.
 
 console.log("✅ Successfully packaged for Hostinger!");
 console.log("📁 The 'deploy' folder has been created at:", deployDir);
@@ -86,5 +94,5 @@ console.log("To deploy to Hostinger:");
 console.log("1. Zip the contents of the 'deploy' folder (not the folder itself).");
 console.log("2. Upload and extract it to your Hostinger public_html or Node.js App directory.");
 console.log("3. Run 'npm install' on the server via SSH/Terminal, or click NPM Install in hPanel.");
-console.log("4. In your Hostinger Node.js panel, ensure 'Application startup file' is set to 'app.js'.");
+console.log("4. In your Hostinger Node.js panel, ensure 'Application startup file' is set to 'app.cjs'.");
 console.log("5. Start the app via the Hostinger Node.js dashboard.");
