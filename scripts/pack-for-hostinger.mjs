@@ -22,6 +22,17 @@ if (fs.existsSync(backendDist)) {
   process.exit(1);
 }
 
+// 1.5 Copy sqlite.db so tables exist in production
+const rootDb = path.resolve(rootDir, 'sqlite.db');
+const apiDb = path.resolve(rootDir, 'artifacts/api-server/sqlite.db');
+if (fs.existsSync(rootDb)) {
+  fs.copyFileSync(rootDb, path.resolve(deployDir, 'sqlite.db'));
+} else if (fs.existsSync(apiDb)) {
+  fs.copyFileSync(apiDb, path.resolve(deployDir, 'sqlite.db'));
+} else {
+  console.log("⚠️ No sqlite.db found. Database will be empty on server.");
+}
+
 // 2. Copy frontend build to deploy/public
 const frontendDist = path.resolve(rootDir, 'artifacts/sukoon/dist/public');
 const deployPublic = path.resolve(deployDir, 'public');
