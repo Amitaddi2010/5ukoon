@@ -600,6 +600,10 @@ importers:
         version: 0.31.10
 
   scripts:
+    dependencies:
+      '@libsql/client':
+        specifier: ^0.14.0
+        version: 0.14.0
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
