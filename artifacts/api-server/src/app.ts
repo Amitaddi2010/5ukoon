@@ -39,13 +39,18 @@ app.use(express.urlencoded({ extended: true }));
 
 const sessionSecret = process.env.SESSION_SECRET || "sukoon-local-dev-secret-2026";
 
+// Trust Hostinger's reverse proxy for secure cookies
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 app.use(
   session({
     secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production" ? "auto" as any : false,
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     },

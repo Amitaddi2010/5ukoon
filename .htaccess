@@ -1,0 +1,8 @@
+DirectoryIndex disabled
+
+RewriteEngine On
+
+# Let Phusion Passenger handle all requests
+PassengerEnabled On
+PassengerAppType node
+PassengerStartupFile app.js
