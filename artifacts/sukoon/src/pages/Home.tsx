@@ -109,7 +109,7 @@ export function AudioPreviewCard() {
   );
 }
 
-export function BentoCard({ children, className = "" }: { children: React.ReactNode, className?: string }) {
+export function BentoCard({ children, className = "", id }: { children: React.ReactNode, className?: string, id?: string }) {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -121,6 +121,7 @@ export function BentoCard({ children, className = "" }: { children: React.ReactN
 
   return (
     <motion.div
+      id={id}
       whileHover={{ scale: 0.98 }}
       onMouseMove={handleMouseMove}
       className={`group relative rounded-[32px] bg-white/[0.02] border border-white/[0.05] overflow-hidden ${className}`}
@@ -463,7 +464,7 @@ export function Home() {
           </BentoCard>
 
           {/* Card 3: The Arc */}
-          <BentoCard className="p-8 md:p-10">
+          <BentoCard id="arc" className="p-8 md:p-10">
             <div className="absolute inset-0 backdrop-blur-3xl" />
             <div className="relative z-10 h-full flex flex-col justify-between pointer-events-none">
               <div className="flex flex-col gap-3">
@@ -491,7 +492,7 @@ export function Home() {
           <AudioPreviewCard />
 
           {/* Card 5: Tickets & Call to Action (Span 2 cols) */}
-          <BentoCard className="md:col-span-2 p-8 sm:p-10 md:p-12 flex flex-col justify-between items-start">
+          <BentoCard id="edition" className="md:col-span-2 p-8 sm:p-10 md:p-12 flex flex-col justify-between items-start">
              <div className="absolute inset-0 bg-gradient-to-t from-[var(--accent-gold)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
              <div className="absolute inset-0 backdrop-blur-3xl" />
              
