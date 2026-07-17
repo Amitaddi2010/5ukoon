@@ -1,8 +1,21 @@
-DirectoryIndex disabled
+DirectoryIndex index.html
 
 RewriteEngine On
+RewriteBase /
 
-# Let Phusion Passenger handle all requests
+# 1. If it's a request to /api, let Passenger and app.js handle it
+RewriteCond %{REQUEST_URI} ^/api/ [NC]
+RewriteRule ^ - [L]
+
+# Let Phusion Passenger handle Node.js apps
 PassengerEnabled On
 PassengerAppType node
 PassengerStartupFile app.js
+
+# 2. For everything else, serve static files if they exist
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# 3. Fallback to index.html for React Router
+RewriteRule ^ index.html [L]
