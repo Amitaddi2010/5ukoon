@@ -609,8 +609,8 @@ export function Home() {
           </span>
 
           <div className="flex items-center gap-8">
-            <a href="#" className="text-[12px] text-white/40 hover:text-[var(--accent-gold)] transition-colors tracking-wide" data-cursor-hover>Instagram</a>
-            <a href="#" className="text-[12px] text-white/40 hover:text-[var(--accent-gold)] transition-colors tracking-wide" data-cursor-hover>WhatsApp</a>
+            <a href="https://www.instagram.com/sukoon.pgi/" target="_blank" rel="noopener noreferrer" className="text-[12px] text-white/40 hover:text-[var(--accent-gold)] transition-colors tracking-wide" data-cursor-hover>Instagram</a>
+            <a href="https://www.youtube.com/@Sukoon_Band" target="_blank" rel="noopener noreferrer" className="text-[12px] text-white/40 hover:text-[var(--accent-gold)] transition-colors tracking-wide" data-cursor-hover>YouTube</a>
             <a href="mailto:hello@sukoon.com" className="text-[12px] text-white/40 hover:text-[var(--accent-gold)] transition-colors tracking-wide" data-cursor-hover>Contact</a>
           </div>
 

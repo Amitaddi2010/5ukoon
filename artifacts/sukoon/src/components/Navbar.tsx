@@ -11,8 +11,8 @@ const navLinks = [
 ];
 
 const socialLinks = [
-  { label: "Instagram", href: "#" },
-  { label: "WhatsApp", href: "#" },
+  { label: "Instagram", href: "https://www.instagram.com/sukoon.pgi/" },
+  { label: "YouTube", href: "https://www.youtube.com/@Sukoon_Band" },
   { label: "Email", href: "mailto:hello@sukoon.com" },
 ];
 
@@ -192,6 +192,8 @@ export function Navbar() {
                       <a
                         key={label}
                         href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="group flex items-center gap-2 text-[13px] text-white/40 hover:text-white transition-colors tracking-wide"
                         data-cursor-hover
                       >
