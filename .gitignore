@@ -51,7 +51,6 @@ Thumbs.db
 # Databases & deployment
 *.db
 sqlite.db
-deploy/
 index.html
 assets/
 public/

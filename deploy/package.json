@@ -1,0 +1,14 @@
+{
+  "name": "sukoon-production",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "NODE_ENV=production node index.mjs"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.14.0",
+    "libsql": "^0.5.29",
+    "@libsql/linux-x64-gnu": "^0.5.29",
+    "@libsql/win32-x64-msvc": "^0.5.29"
+  }
+}

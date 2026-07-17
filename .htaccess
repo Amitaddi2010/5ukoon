@@ -1,4 +1,0 @@
-Options -MultiViews
-PassengerEnabled On
-PassengerAppType node
-PassengerStartupFile app.js
