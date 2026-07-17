@@ -7,6 +7,7 @@ const __dirname = path.dirname(__filename);
 
 const rootDir = path.resolve(__dirname, '..');
 const frontendDist = path.resolve(rootDir, 'artifacts/sukoon/dist/public');
+const destDir = path.resolve(rootDir, 'public');
 
 function copyDir(src, dest) {
   if (!fs.existsSync(dest)) {
@@ -25,8 +26,8 @@ function copyDir(src, dest) {
 }
 
 if (fs.existsSync(frontendDist)) {
-  console.log(`Copying frontend build from ${frontendDist} to ${rootDir}`);
-  copyDir(frontendDist, rootDir);
+  console.log(`Copying frontend build from ${frontendDist} to ${destDir}`);
+  copyDir(frontendDist, destDir);
   console.log('Frontend copied successfully.');
 } else {
   console.warn(`Frontend build not found at ${frontendDist}`);

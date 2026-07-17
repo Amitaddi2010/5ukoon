@@ -63,7 +63,7 @@ app.use("/api", router);
 
 // Serve the compiled frontend static files
 const frontendPath = process.env.NODE_ENV === "production" 
-  ? path.resolve(__dirname, "public") 
+  ? path.resolve(process.cwd(), "public") 
   : path.resolve(__dirname, "../../sukoon/dist/public");
 app.use(express.static(frontendPath));
 
