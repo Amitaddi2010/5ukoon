@@ -53,4 +53,4 @@ Thumbs.db
 sqlite.db
 index.html
 assets/
-public/
+/public/
