@@ -36,12 +36,12 @@ async function startApp() {
     console.error("Failed to start Sukoon server:", err);
     
     // Fallback: serve a basic error page so the user doesn't get 403
-    const express = require('express');
-    const fallbackApp = express();
-    fallbackApp.use((req, res) => {
-      res.status(500).send('<html><body><h1>Sukoon</h1><p>Server is starting up. Please refresh in a moment.</p><pre>' + err.message + '\n' + (err.stack || '') + '</pre></body></html>');
+    const http = require('http');
+    const server = http.createServer((req, res) => {
+      res.writeHead(500, { 'Content-Type': 'text/html' });
+      res.end('<html><body><h1>Sukoon</h1><p>Server is starting up or encountered an error. Please refresh in a moment.</p><pre>' + err.message + '\n' + (err.stack || '') + '</pre></body></html>');
     });
-    fallbackApp.listen(process.env.PORT || 3000);
+    server.listen(process.env.PORT || 3000);
   }
 }
 
