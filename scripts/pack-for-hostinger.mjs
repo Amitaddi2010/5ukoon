@@ -58,6 +58,8 @@ const envFile = `PORT=3000
 NODE_ENV=production
 SESSION_SECRET=your_super_secret_key_change_me
 DATABASE_URL=file:sqlite.db
+ADMIN_USERNAME=secure_admin
+ADMIN_PASSWORD=your_secure_password_here
 `;
 fs.writeFileSync(path.resolve(deployDir, '.env'), envFile);
 
