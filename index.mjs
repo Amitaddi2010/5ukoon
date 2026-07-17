@@ -61627,7 +61627,7 @@ router2.get("/events", async (req, res) => {
     );
   } catch (err) {
     req.log.error({ err }, "Failed to list events");
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error", message: err.message, stack: err.stack });
   }
 });
 router2.get("/events/:id", async (req, res) => {
