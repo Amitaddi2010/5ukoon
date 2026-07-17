@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "NODE_ENV=production node app.js"
+    "start": "NODE_ENV=production node app.js",
+    "build": "echo 'Already built! Skipping build step for Hostinger...'"
   },
   "dependencies": {
     "@libsql/client": "^0.14.0",
