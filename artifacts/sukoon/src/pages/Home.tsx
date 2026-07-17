@@ -10,7 +10,7 @@ const fadeUp = {
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: "-60px" },
   transition: { duration: 0.7, ease: [0.25, 0.1, 0.25, 1] },
-};
+} as any;
 
 const splitTextVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -19,7 +19,7 @@ const splitTextVariants = {
     y: 0,
     transition: { staggerChildren: 0.08, delayChildren: 0.04 * i, ease: [0.25, 0.1, 0.25, 1], duration: 0.8 },
   }),
-};
+} as any;
 
 const wordVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -28,7 +28,7 @@ const wordVariants = {
     y: 0,
     transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }
   },
-};
+} as any;
 
 export function AnimatedText({ text, className, delay = 0 }: { text: string, className?: string, delay?: number }) {
   const lines = text.split("\n");

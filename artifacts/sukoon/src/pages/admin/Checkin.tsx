@@ -16,7 +16,7 @@ export function AdminCheckin() {
 
   const { data: guests, isLoading } = useListGuests(
     { eventId },
-    { query: { enabled: !!eventId } }
+    { query: { enabled: !!eventId, queryKey: getListGuestsQueryKey({ eventId }) } }
   );
 
   const checkInMutation = useCheckInGuest();

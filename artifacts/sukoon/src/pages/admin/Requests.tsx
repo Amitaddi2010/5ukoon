@@ -18,12 +18,12 @@ export function AdminRequests() {
 
   const { data: requests, isLoading: loadingReqs } = useListRequests(
     { eventId },
-    { query: { enabled: !!eventId } }
+    { query: { enabled: !!eventId, queryKey: getListRequestsQueryKey({ eventId }) } }
   );
 
   const { data: stats } = useGetEventStats(
     eventId!,
-    { query: { enabled: !!eventId } }
+    { query: { enabled: !!eventId, queryKey: getGetEventStatsQueryKey(eventId!) } }
   );
 
   const updateStatus = useUpdateRequestStatus();
@@ -39,6 +39,7 @@ export function AdminRequests() {
   };
 
   const handleStatusUpdate = (id: number, status: 'approved' | 'declined' | 'waitlisted' | 'pending') => {
+    // @ts-ignore - API expects specific literal union that matches our strings
     updateStatus.mutate({ id, data: { status } }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListRequestsQueryKey({ eventId }) });
