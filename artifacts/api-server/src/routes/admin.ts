@@ -19,10 +19,10 @@ router.post("/admin/login", async (req, res) => {
 
   try {
     // 1. Check environment variables first (most secure & convenient)
-    const envUser = process.env.ADMIN_USERNAME;
-    const envPass = process.env.ADMIN_PASSWORD;
+    const envUser = process.env.ADMIN_USERNAME?.trim();
+    const envPass = process.env.ADMIN_PASSWORD?.trim();
 
-    if (envUser && envPass && username === envUser && password === envPass) {
+    if (envUser && envPass && username.trim() === envUser && password === envPass) {
       (req.session as any).admin = { username: envUser, name: "Administrator" };
       return res.json({ username: envUser, name: "Administrator" });
     }
