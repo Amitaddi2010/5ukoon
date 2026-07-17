@@ -39,7 +39,7 @@ const pkgJson = {
   version: "1.0.0",
   type: "module",
   scripts: {
-    start: "NODE_ENV=production node index.mjs"
+    start: "NODE_ENV=production node app.js"
   },
   dependencies: {
     "@libsql/client": "^0.14.0",
@@ -53,6 +53,19 @@ fs.writeFileSync(
   JSON.stringify(pkgJson, null, 2)
 );
 
+// 3.5 Create app.js wrapper for Hostinger (Passenger prefers app.js)
+fs.writeFileSync(
+  path.resolve(deployDir, 'app.js'),
+  `import './index.mjs';\n`
+);
+
+// 3.6 Create default .htaccess for Hostinger Node.js to prevent 403 Forbidden
+const htaccessContent = `# DO NOT REMOVE. ALREADY CONFIGURED ON HOSTINGER.
+PassengerAppType node
+PassengerStartupFile app.js
+`;
+fs.writeFileSync(path.resolve(deployDir, '.htaccess'), htaccessContent);
+
 // 4. Create a .env template or pre-configured file for hostinger
 const envFile = `PORT=3000
 NODE_ENV=production
@@ -63,7 +76,7 @@ ADMIN_PASSWORD=your_secure_password_here
 `;
 fs.writeFileSync(path.resolve(deployDir, '.env'), envFile);
 
-// We will rely on index.mjs as the entry point for Hostinger's Node.js App.
+// We will rely on app.js as the entry point for Hostinger's Node.js App.
 
 console.log("✅ Successfully packaged for Hostinger!");
 console.log("📁 The 'deploy' folder has been created at:", deployDir);
@@ -71,5 +84,6 @@ console.log("");
 console.log("To deploy to Hostinger:");
 console.log("1. Zip the contents of the 'deploy' folder (not the folder itself).");
 console.log("2. Upload and extract it to your Hostinger public_html or Node.js App directory.");
-console.log("3. Run 'npm install' on the server via SSH/Terminal.");
-console.log("4. Start the app using 'npm start' or via the Hostinger Node.js dashboard (pointing to index.mjs).");
+console.log("3. Run 'npm install' on the server via SSH/Terminal, or click NPM Install in hPanel.");
+console.log("4. In your Hostinger Node.js panel, ensure 'Application startup file' is set to 'app.js'.");
+console.log("5. Start the app via the Hostinger Node.js dashboard.");

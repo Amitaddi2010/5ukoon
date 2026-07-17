@@ -1,0 +1,3 @@
+# DO NOT REMOVE. ALREADY CONFIGURED ON HOSTINGER.
+PassengerAppType node
+PassengerStartupFile app.js
