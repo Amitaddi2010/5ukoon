@@ -23,7 +23,7 @@ if (fs.existsSync(backendDist)) {
 }
 
 // 1.5 Copy sqlite.db so tables exist in production
-const rootDb = path.resolve(rootDir, 'sqlite.db');
+const rootDb = path.resolve(rootDir, 'lib/db/sqlite.db');
 const apiDb = path.resolve(rootDir, 'artifacts/api-server/sqlite.db');
 if (fs.existsSync(rootDb)) {
   fs.copyFileSync(rootDb, path.resolve(deployDir, 'sqlite.db'));
