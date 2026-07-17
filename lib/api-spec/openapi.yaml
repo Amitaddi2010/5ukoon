@@ -280,6 +280,33 @@ paths:
         "401":
           description: Unauthorized
 
+  /admin/events/{id}:
+    patch:
+      operationId: updateEvent
+      tags: [admin]
+      summary: Update event pricing and offers (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventUpdateInput"
+      responses:
+        "200":
+          description: Updated successfully
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+
 components:
   schemas:
     HealthStatus:
@@ -311,6 +338,10 @@ components:
           type: integer
         price:
           type: number
+        originalPrice:
+          type: ["number", "null"]
+        offerText:
+          type: ["string", "null"]
         status:
           type: string
           enum: [upcoming, past, cancelled]
@@ -338,6 +369,16 @@ components:
           type: integer
         arrived:
           type: integer
+
+    EventUpdateInput:
+      type: object
+      properties:
+        price:
+          type: number
+        originalPrice:
+          type: number
+        offerText:
+          type: string
 
     AttendanceRequest:
       type: object

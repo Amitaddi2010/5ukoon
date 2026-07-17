@@ -97,6 +97,12 @@ export function AdminRequests() {
           </div>
           <div className="flex items-center gap-6">
             <Link
+              href="/admin/events"
+              className="text-[12px] tracking-[0.12em] uppercase text-white/40 hover:text-white transition-colors font-medium"
+            >
+              Events
+            </Link>
+            <Link
               href="/admin/checkin"
               className="text-[12px] tracking-[0.12em] uppercase text-white/40 hover:text-white transition-colors font-medium"
             >

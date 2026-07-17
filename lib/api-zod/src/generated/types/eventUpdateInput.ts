@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type ListGuestsParams = {
-eventId?: number;
-};
+export interface EventUpdateInput {
+  price?: number;
+  originalPrice?: number;
+  offerText?: string;
+}

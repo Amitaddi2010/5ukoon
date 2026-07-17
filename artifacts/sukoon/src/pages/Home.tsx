@@ -503,9 +503,19 @@ export function Home() {
              <div className="relative z-10 mt-12 sm:mt-auto w-full flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                <div className="max-w-xl">
                  <AnimatedText text="Reserve your spot at Sukoon" className="text-3xl sm:text-4xl md:text-5xl font-display text-white mb-4 tracking-[-0.02em] leading-tight" delay={1} />
-                 <p className="text-white/50 text-[13px] sm:text-[14px] leading-relaxed">
-                   Applications reviewed on a rolling basis. <br className="hidden sm:block" />
-                   <span className="text-white/90 font-medium">Entry: ₹{nextEvent?.price ?? "299"}</span>
+                 <p className="text-white/50 text-[13px] sm:text-[14px] leading-relaxed flex items-center gap-2 flex-wrap">
+                   <span>Applications reviewed on a rolling basis.</span>
+                   <span className="flex items-center gap-2">
+                     <span className="text-white/90 font-medium">Entry: ₹{nextEvent?.price ?? "299"}</span>
+                     {(nextEvent as any)?.originalPrice && (
+                       <span className="text-white/40 line-through text-[12px]">₹{(nextEvent as any).originalPrice}</span>
+                     )}
+                   </span>
+                   {(nextEvent as any)?.offerText && (
+                     <span className="bg-[var(--accent-gold)]/20 text-[var(--accent-gold)] border border-[var(--accent-gold)]/30 px-2 py-0.5 rounded text-[10px] uppercase tracking-wider font-bold ml-1">
+                       {(nextEvent as any).offerText}
+                     </span>
+                   )}
                  </p>
                </div>
                

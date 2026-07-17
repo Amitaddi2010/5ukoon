@@ -59,4 +59,35 @@ router.get("/admin/me", (req, res) => {
   return res.json(admin);
 });
 
+// PATCH /admin/events/:id - Update pricing and offers
+router.patch("/admin/events/:id", async (req, res) => {
+  if (!(req.session as any)?.admin) return res.status(401).json({ error: "Unauthorized" });
+  const id = Number(req.params.id);
+  if (!id) return res.status(400).json({ error: "Invalid event ID" });
+
+  try {
+    // Dynamically import eventsTable from db to avoid circular/missing imports if it was missing
+    const { eventsTable } = await import("@workspace/db");
+    
+    const { price, originalPrice, offerText } = req.body;
+    
+    // We update only the fields that were provided
+    const updateData: any = {};
+    if (price !== undefined) updateData.price = price;
+    if (originalPrice !== undefined) updateData.originalPrice = originalPrice;
+    if (offerText !== undefined) updateData.offerText = offerText;
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ error: "No fields to update" });
+    }
+
+    await db.update(eventsTable).set(updateData).where(eq(eventsTable.id, id));
+    
+    return res.json({ ok: true });
+  } catch (err) {
+    req.log.error({ err }, "Failed to update event details");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;

@@ -11,6 +11,8 @@ export const eventsTable = sqliteTable("events", {
   venue: text("venue"),
   capacity: integer("capacity").notNull().default(25),
   price: real("price").notNull(),
+  originalPrice: real("original_price"),
+  offerText: text("offer_text"),
   status: text("status", { enum: ["upcoming", "past", "cancelled"] }).notNull().default("upcoming"),
   rsvpLink: text("rsvp_link"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
