@@ -72,6 +72,8 @@ startApp().catch(err => {
 const htaccessContent = `# DO NOT REMOVE. ALREADY CONFIGURED ON HOSTINGER.
 PassengerAppType node
 PassengerStartupFile app.cjs
+PassengerAppEnv development
+PassengerFriendlyErrorPages on
 `;
 fs.writeFileSync(path.resolve(deployDir, '.htaccess'), htaccessContent);
 
