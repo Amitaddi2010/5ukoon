@@ -6,7 +6,7 @@
     "build": "pnpm run typecheck && pnpm --filter \"./artifacts/api-server\" --filter \"./artifacts/sukoon\" run build && node scripts/postbuild.mjs",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
-    "hostinger-build": "npx pnpm install && npx pnpm run build",
+    "hostinger-build": "node -e \"const fs=require('fs'); fs.rmSync('node_modules/.pnpm', {recursive:true, force:true})\" && npx pnpm install && node scripts/update-price.mjs && npx pnpm run build",
     "start": "node artifacts/api-server/dist/index.mjs"
   },
   "private": true,
