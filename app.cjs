@@ -1,4 +1,10 @@
-// Hostinger Node.js Entry Point wrapper
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
+
 import("./scripts/init-db.mjs")
   .then(() => {
     return import("./artifacts/api-server/dist/index.mjs");
