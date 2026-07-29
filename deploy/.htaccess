@@ -1,5 +1,5 @@
 # DO NOT REMOVE. ALREADY CONFIGURED ON HOSTINGER.
 PassengerAppType node
 PassengerStartupFile app.cjs
-PassengerAppEnv development
+PassengerAppEnv production
 PassengerFriendlyErrorPages on

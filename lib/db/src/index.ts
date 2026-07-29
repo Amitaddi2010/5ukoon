@@ -3,8 +3,9 @@ import { createClient } from "@libsql/client";
 import * as schema from "./schema";
 import path from "path";
 
-// Always resolve from process.cwd() — on Hostinger, this is the repository root
-const dbPath = path.resolve(process.cwd(), "lib/db/sqlite.db").replace(/\\/g, '/');
+// Resolve db path — on Hostinger, the deploy root contains sqlite.db directly
+// The fallback only applies if DATABASE_URL env is not set
+const dbPath = path.resolve(process.cwd(), "sqlite.db").replace(/\\/g, '/');
 const url = process.env.DATABASE_URL || `file:${dbPath}`;
 
 export const sqlite = createClient({ url });

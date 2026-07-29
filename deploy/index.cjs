@@ -57628,7 +57628,7 @@ var init_src = __esm({
     init_schema();
     import_path = __toESM(require("path"), 1);
     init_schema();
-    dbPath = import_path.default.resolve(process.cwd(), "lib/db/sqlite.db").replace(/\\/g, "/");
+    dbPath = import_path.default.resolve(process.cwd(), "sqlite.db").replace(/\\/g, "/");
     url2 = process.env.DATABASE_URL || `file:${dbPath}`;
     sqlite = createClient({ url: url2 });
     db = drizzle(sqlite, { schema: schema_exports });

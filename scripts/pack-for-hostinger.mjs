@@ -122,7 +122,7 @@ startApp().catch(err => {
 const htaccessContent = `# DO NOT REMOVE. ALREADY CONFIGURED ON HOSTINGER.
 PassengerAppType node
 PassengerStartupFile app.cjs
-PassengerAppEnv development
+PassengerAppEnv production
 PassengerFriendlyErrorPages on
 `;
 fs.writeFileSync(path.resolve(deployDir, '.htaccess'), htaccessContent);
@@ -131,7 +131,7 @@ fs.writeFileSync(path.resolve(deployDir, '.htaccess'), htaccessContent);
 const envFile = `PORT=3000
 NODE_ENV=production
 SESSION_SECRET=your_super_secret_key_change_me
-DATABASE_URL=file:sqlite.db
+DATABASE_URL=file:./sqlite.db
 ADMIN_USERNAME=secure_admin
 ADMIN_PASSWORD=your_secure_password_here
 `;
