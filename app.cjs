@@ -1,38 +1,41 @@
-// Hostinger LiteSpeed lsnode Entry Point (Pure CommonJS)
-// LiteSpeed's lsnode runtime automatically patches http.Server.listen()
-// to redirect to the LSAPI socket. We should NOT manually bind to LSNODE_SOCKET.
+// Hostinger LiteSpeed lsnode Entry Point
+// Test: create a bare http.createServer to verify lsnode interception
+const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
 const logFile = path.join(__dirname, "startup-error.log");
 
 process.on("unhandledRejection", (reason) => {
-  const msg = `[${new Date().toISOString()}] Unhandled Rejection: ${reason}\n${reason && reason.stack ? reason.stack : ""}\n`;
-  fs.appendFileSync(logFile, msg);
+  fs.appendFileSync(logFile, `[${new Date().toISOString()}] Unhandled Rejection: ${reason}\n`);
 });
 process.on("uncaughtException", (err) => {
-  const msg = `[${new Date().toISOString()}] Uncaught Exception: ${err.message}\n${err.stack}\n`;
-  fs.appendFileSync(logFile, msg);
+  fs.appendFileSync(logFile, `[${new Date().toISOString()}] Uncaught Exception: ${err.message}\n${err.stack}\n`);
 });
 
 process.env.NODE_ENV = process.env.NODE_ENV || "production";
 
-const startupInfo = `[${new Date().toISOString()}] Starting app.cjs (LiteSpeed lsnode)\n` +
+fs.writeFileSync(logFile, `[${new Date().toISOString()}] Starting app.cjs\n` +
   `  CWD: ${process.cwd()}\n` +
   `  __dirname: ${__dirname}\n` +
   `  LSNODE_SOCKET: ${process.env.LSNODE_SOCKET || "(none)"}\n` +
-  `  PORT: ${process.env.PORT || "(none, using default 3000)"}\n` +
-  `  NODE_ENV: ${process.env.NODE_ENV}\n` +
-  `  Node version: ${process.version}\n`;
-fs.writeFileSync(logFile, startupInfo);
+  `  Node: ${process.version}\n`);
 
-// Load the CJS server bundle — it calls app.listen(3000)
-// lsnode will intercept the listen() call and handle LSAPI protocol
-try {
-  require("./artifacts/api-server/dist/index.cjs");
-  fs.appendFileSync(logFile, `[${new Date().toISOString()}] Server loaded successfully (lsnode manages LSAPI socket)\n`);
-} catch (err) {
-  const msg = `[${new Date().toISOString()}] Failed to require index.cjs: ${err.message}\n${err.stack}\n`;
-  fs.appendFileSync(logFile, msg);
-  process.exit(1);
-}
+// Step 1: Create a bare http server to test if lsnode intercepts it
+const server = http.createServer((req, res) => {
+  fs.appendFileSync(logFile, `[${new Date().toISOString()}] REQUEST: ${req.method} ${req.url}\n`);
+
+  // Try loading Express app for real requests
+  try {
+    const app = require("./artifacts/api-server/dist/index.cjs");
+  } catch (e) {
+    // Already loaded or error — ignore
+  }
+
+  res.writeHead(200, { "Content-Type": "text/html" });
+  res.end("<h1>Sukoon Server is Running!</h1><p>LiteSpeed lsnode connection verified.</p>");
+});
+
+server.listen(3000, () => {
+  fs.appendFileSync(logFile, `[${new Date().toISOString()}] http.createServer listening on 3000\n`);
+});
