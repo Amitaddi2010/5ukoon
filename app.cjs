@@ -1,4 +1,4 @@
-// Hostinger Node.js Entry Point
+// Hostinger LiteSpeed Node.js Entry Point (Pure CommonJS)
 const fs = require("fs");
 const path = require("path");
 
@@ -13,24 +13,24 @@ process.on("uncaughtException", (err) => {
   fs.appendFileSync(logFile, msg);
 });
 
-// Do NOT overwrite process.env.PORT if Hostinger passed a port or socket
-const envKeys = Object.keys(process.env).sort().join(", ");
-const startupInfo = `[${new Date().toISOString()}] Starting app.cjs\n` +
+process.env.NODE_ENV = process.env.NODE_ENV || "production";
+
+const listenTarget = process.env.LSNODE_SOCKET || process.env.PORT || 3000;
+
+const startupInfo = `[${new Date().toISOString()}] Starting app.cjs (LiteSpeed Node)\n` +
   `  CWD: ${process.cwd()}\n` +
   `  __dirname: ${__dirname}\n` +
-  `  PORT env: ${process.env.PORT || "(undefined)"}\n` +
-  `  SERVER_PORT: ${process.env.SERVER_PORT || "(undefined)"}\n` +
-  `  PASSENGER_APP_ENV: ${process.env.PASSENGER_APP_ENV || "(undefined)"}\n` +
-  `  Node version: ${process.version}\n` +
-  `  ENV KEYS: ${envKeys}\n`;
+  `  LSNODE_SOCKET: ${process.env.LSNODE_SOCKET || "(none)"}\n` +
+  `  PORT: ${process.env.PORT || "(none)"}\n` +
+  `  TARGET: ${listenTarget}\n` +
+  `  NODE_ENV: ${process.env.NODE_ENV}\n` +
+  `  Node version: ${process.version}\n`;
 fs.writeFileSync(logFile, startupInfo);
-
-process.env.NODE_ENV = process.env.NODE_ENV || "production";
 
 // Load the CJS server bundle
 try {
   require("./artifacts/api-server/dist/index.cjs");
-  fs.appendFileSync(logFile, `[${new Date().toISOString()}] Server loaded successfully. PORT=${process.env.PORT}\n`);
+  fs.appendFileSync(logFile, `[${new Date().toISOString()}] Server loaded successfully listening on ${listenTarget}\n`);
 } catch (err) {
   const msg = `[${new Date().toISOString()}] Failed to require index.cjs: ${err.message}\n${err.stack}\n`;
   fs.appendFileSync(logFile, msg);
