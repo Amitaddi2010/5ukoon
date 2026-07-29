@@ -52,6 +52,7 @@ export function AdminRequests() {
     });
   };
   const logout = useAdminLogout();
+  const updateStatus = useUpdateRequestStatus();
 
   const handleLogout = () => {
     logout.mutate(undefined, {
