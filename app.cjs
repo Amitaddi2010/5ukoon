@@ -4,6 +4,6 @@ import("./scripts/init-db.mjs")
     return import("./artifacts/api-server/dist/index.mjs");
   })
   .catch((err) => {
-    console.error("Failed to start server from app.js:", err);
+    console.error("Failed to start server from app.cjs:", err);
     process.exit(1);
   });
