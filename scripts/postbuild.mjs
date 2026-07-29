@@ -25,10 +25,16 @@ function copyDir(src, dest) {
   }
 }
 
-if (fs.existsSync(frontendDist)) {
-  console.log(`Copying frontend build from ${frontendDist} to ${destDir}`);
-  copyDir(frontendDist, destDir);
-  console.log('Frontend copied successfully.');
-} else {
-  console.warn(`Frontend build not found at ${frontendDist}`);
+try {
+  if (fs.existsSync(frontendDist)) {
+    console.log(`Copying frontend build from ${frontendDist} to ${destDir}`);
+    copyDir(frontendDist, destDir);
+    console.log('Frontend copied successfully.');
+  } else {
+    console.warn(`Frontend build not found at ${frontendDist}`);
+  }
+  process.exit(0);
+} catch (err) {
+  console.error('Error during postbuild:', err);
+  process.exit(1);
 }
