@@ -57,19 +57,23 @@ app.use(
   })
 );
 
+import fs from "fs";
 import path from "path";
 
 app.use("/api", router);
 
 // Serve the compiled frontend static files
-const frontendPath = process.env.NODE_ENV === "production" 
-  ? path.resolve(process.cwd(), "public") 
-  : path.resolve(__dirname, "../../sukoon/dist/public");
+const frontendPath = path.resolve(process.cwd(), "public");
 app.use(express.static(frontendPath));
 
 // Fallback all other routes to index.html for client-side routing
-app.get(/(.*)/, (req, res) => {
-  res.sendFile(path.resolve(frontendPath, "index.html"));
+app.get("*", (req, res) => {
+  const indexPath = path.resolve(frontendPath, "index.html");
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(200).send("<h1>Sukoon API Server Running</h1>");
+  }
 });
 
 export default app;
