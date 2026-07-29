@@ -62463,9 +62463,10 @@ app.use((req, res, next) => {
 var app_default = app;
 
 // src/index.ts
-var port = Number(process.env.PORT) || 3e3;
+var rawPort = process.env.PORT || process.env.LSNODE_SOCKET || 3e3;
+var port = typeof rawPort === "string" && !isNaN(Number(rawPort)) ? Number(rawPort) : rawPort;
 app_default.listen(port, () => {
-  logger.info({ port }, `Sukoon server listening on port ${port}`);
+  logger.info({ port }, `Sukoon server listening on ${port}`);
 });
 /*! Bundled license information:
 
