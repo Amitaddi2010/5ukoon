@@ -62,11 +62,19 @@ import path from "path";
 
 app.use("/api", router);
 
-// Serve the compiled frontend static files
-const frontendPath = path.resolve(process.cwd(), "public");
+// Serve compiled static frontend with multiple directory fallbacks
+const possibleFrontendPaths = [
+  path.resolve(process.cwd(), "public"),
+  path.resolve(__dirname, "../../public"),
+  path.resolve(__dirname, "../../../public"),
+  path.resolve(__dirname, "../../sukoon/dist/public"),
+];
+
+const frontendPath = possibleFrontendPaths.find((p) => fs.existsSync(path.join(p, "index.html"))) || possibleFrontendPaths[0];
+
 app.use(express.static(frontendPath));
 
-// Fallback all other routes to index.html for client-side routing
+// Fallback all non-API routes to index.html for client-side SPA routing
 app.get("*", (req, res) => {
   const indexPath = path.resolve(frontendPath, "index.html");
   if (fs.existsSync(indexPath)) {
