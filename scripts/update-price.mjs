@@ -4,10 +4,11 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dbPath = path.resolve(__dirname, '../sqlite.db');
+const dbPath = path.resolve(__dirname, '../lib/db/sqlite.db').replace(/\\/g, '/');
+const url = process.env.DATABASE_URL || `file:${dbPath}`;
 
 async function main() {
-  const sqlite = createClient({ url: `file:${dbPath}` });
+  const sqlite = createClient({ url });
   try {
     // Attempt to add new columns if they don't exist (SQLite will throw if they already exist, we ignore it)
     try { await sqlite.execute("ALTER TABLE events ADD COLUMN original_price REAL"); } catch (e) {}
