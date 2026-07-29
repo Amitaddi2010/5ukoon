@@ -23,28 +23,21 @@ process.on("uncaughtException", (err) => {
 process.env.NODE_ENV = process.env.NODE_ENV || "production";
 log(`Starting Sukoon Production Server (CWD: ${process.cwd()}, Node: ${process.version})`);
 
-async function startServer() {
+// Synchronously require compiled CJS backend so app.listen() executes during Passenger startup
+try {
+  const mod = require("./artifacts/api-server/dist/index.cjs");
+  global.__sukoon_mod = mod;
+  log("Express server loaded synchronously via CJS.");
+} catch (err) {
+  log(`CJS load error, attempting ESM fallback: ${err.message}`);
   try {
-    await import("./scripts/init-db.mjs").catch((err) => {
-      log(`DB init notice: ${err.message}`);
+    import("./artifacts/api-server/dist/index.mjs").then((mod) => {
+      global.__sukoon_mod = mod;
+      log("Express server started via ESM fallback.");
+    }).catch((esmErr) => {
+      log(`Critical startup failure (ESM): ${esmErr.message}\n${esmErr.stack}`);
     });
-
-    const mod = await import("./artifacts/api-server/dist/index.mjs");
-    global.__sukoon_mod = mod;
-    log("Express server started successfully.");
-  } catch (err) {
-    log(`Error starting ES module server, attempting CJS fallback: ${err.message}`);
-    try {
-      const cjsMod = require("./artifacts/api-server/dist/index.cjs");
-      global.__sukoon_mod = cjsMod;
-      log("Express server started successfully via CJS fallback.");
-    } catch (cjsErr) {
-      log(`Critical startup failure: ${cjsErr.message}\n${cjsErr.stack}`);
-      throw cjsErr;
-    }
+  } catch (esmErr) {
+    log(`Critical startup failure: ${esmErr.message}\n${esmErr.stack}`);
   }
 }
-
-startServer().catch((err) => {
-  log(`Failed to launch Sukoon application: ${err.message}`);
-});
