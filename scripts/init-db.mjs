@@ -47,7 +47,7 @@ async function initDb() {
         city TEXT NOT NULL,
         venue TEXT,
         capacity INTEGER NOT NULL DEFAULT 25,
-        price TEXT NOT NULL,
+        price REAL NOT NULL DEFAULT 0,
         original_price REAL,
         offer_text TEXT,
         status TEXT NOT NULL DEFAULT 'upcoming',
@@ -85,6 +85,8 @@ async function initDb() {
         why_attend TEXT,
         attendance_possibility TEXT,
         status TEXT NOT NULL DEFAULT 'pending',
+        ticket_code TEXT,
+        checked_in INTEGER NOT NULL DEFAULT 0,
         created_at INTEGER NOT NULL
       );
     `);
@@ -93,14 +95,49 @@ async function initDb() {
     await client.execute(`
       CREATE TABLE IF NOT EXISTS guests (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        event_id INTEGER NOT NULL,
         request_id INTEGER NOT NULL,
-        pass_code TEXT NOT NULL UNIQUE,
+        event_id INTEGER NOT NULL,
+        name TEXT NOT NULL DEFAULT '',
+        phone TEXT NOT NULL DEFAULT '',
+        email TEXT NOT NULL DEFAULT '',
+        ticket_code TEXT NOT NULL DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'confirmed',
         checked_in INTEGER NOT NULL DEFAULT 0,
         checked_in_at INTEGER,
         created_at INTEGER NOT NULL
       );
     `);
+
+    // Column migrations for existing tables created before new features
+    const migrations = [
+      "ALTER TABLE events ADD COLUMN original_price REAL",
+      "ALTER TABLE events ADD COLUMN offer_text TEXT",
+      "ALTER TABLE events ADD COLUMN rsvp_link TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN user_id INTEGER",
+      "ALTER TABLE attendance_requests ADD COLUMN social_handle TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN heard_about TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN mutual_connection TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN why_attend TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN department TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN attendance_possibility TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN ticket_code TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN checked_in INTEGER NOT NULL DEFAULT 0",
+      "ALTER TABLE guests ADD COLUMN name TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE guests ADD COLUMN phone TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE guests ADD COLUMN email TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE guests ADD COLUMN ticket_code TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE guests ADD COLUMN status TEXT NOT NULL DEFAULT 'confirmed'",
+      "ALTER TABLE guests ADD COLUMN checked_in INTEGER NOT NULL DEFAULT 0",
+      "ALTER TABLE guests ADD COLUMN checked_in_at INTEGER",
+    ];
+
+    for (const sql of migrations) {
+      try {
+        await client.execute(sql);
+      } catch (e) {
+        // Column already exists — safe to ignore
+      }
+    }
 
     // Seed default admin if empty
     const adminCheck = await client.execute("SELECT COUNT(*) as count FROM admins;");
@@ -125,7 +162,7 @@ async function initDb() {
           "Chandigarh",
           "ODH Mess Rooftop, PGIMER",
           25,
-          "299",
+          299,
           499,
           "Early Bird Offer",
           "upcoming",

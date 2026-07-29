@@ -5,7 +5,7 @@ import __bannerUrl from 'node:url';
 globalThis.require = __bannerCrReq(import.meta.url);
 globalThis.__filename = __bannerUrl.fileURLToPath(import.meta.url);
 globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
-    
+
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -18782,7 +18782,7 @@ var require_view = __commonJS({
     "use strict";
     var debug = require_src()("express:view");
     var path3 = __require("node:path");
-    var fs = __require("node:fs");
+    var fs2 = __require("node:fs");
     var dirname = path3.dirname;
     var basename = path3.basename;
     var extname = path3.extname;
@@ -18862,7 +18862,7 @@ var require_view = __commonJS({
     function tryStat(path4) {
       debug('stat "%s"', path4);
       try {
-        return fs.statSync(path4);
+        return fs2.statSync(path4);
       } catch (e) {
         return void 0;
       }
@@ -20709,27 +20709,27 @@ var require_router = __commonJS({
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var methods = METHODS.map((method) => method.toLowerCase());
-    module.exports = Router7;
+    module.exports = Router8;
     module.exports.Route = Route;
-    function Router7(options) {
-      if (!(this instanceof Router7)) {
-        return new Router7(options);
+    function Router8(options) {
+      if (!(this instanceof Router8)) {
+        return new Router8(options);
       }
       const opts = options || {};
-      function router7(req, res, next) {
-        router7.handle(req, res, next);
+      function router8(req, res, next) {
+        router8.handle(req, res, next);
       }
-      Object.setPrototypeOf(router7, this);
-      router7.caseSensitive = opts.caseSensitive;
-      router7.mergeParams = opts.mergeParams;
-      router7.params = {};
-      router7.strict = opts.strict;
-      router7.stack = [];
-      return router7;
+      Object.setPrototypeOf(router8, this);
+      router8.caseSensitive = opts.caseSensitive;
+      router8.mergeParams = opts.mergeParams;
+      router8.params = {};
+      router8.strict = opts.strict;
+      router8.stack = [];
+      return router8;
     }
-    Router7.prototype = function() {
+    Router8.prototype = function() {
     };
-    Router7.prototype.param = function param(name, fn) {
+    Router8.prototype.param = function param(name, fn) {
       if (!name) {
         throw new TypeError("argument name is required");
       }
@@ -20749,7 +20749,7 @@ var require_router = __commonJS({
       params.push(fn);
       return this;
     };
-    Router7.prototype.handle = function handle(req, res, callback) {
+    Router8.prototype.handle = function handle(req, res, callback) {
       if (!callback) {
         throw new TypeError("argument callback is required");
       }
@@ -20876,7 +20876,7 @@ var require_router = __commonJS({
         }
       }
     };
-    Router7.prototype.use = function use(handler) {
+    Router8.prototype.use = function use(handler) {
       let offset = 0;
       let path3 = "/";
       if (typeof handler !== "function") {
@@ -20909,7 +20909,7 @@ var require_router = __commonJS({
       }
       return this;
     };
-    Router7.prototype.route = function route(path3) {
+    Router8.prototype.route = function route(path3) {
       const route2 = new Route(path3);
       const layer = new Layer(path3, {
         sensitive: this.caseSensitive,
@@ -20924,7 +20924,7 @@ var require_router = __commonJS({
       return route2;
     };
     methods.concat("all").forEach(function(method) {
-      Router7.prototype[method] = function(path3) {
+      Router8.prototype[method] = function(path3) {
         const route = this.route(path3);
         route[method].apply(route, slice.call(arguments, 1));
         return this;
@@ -21107,13 +21107,13 @@ var require_application = __commonJS({
     var compileTrust = require_utils3().compileTrust;
     var resolve = __require("node:path").resolve;
     var once = require_once();
-    var Router7 = require_router();
+    var Router8 = require_router();
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var app2 = exports = module.exports = {};
     var trustProxyDefaultSymbol = "@@symbol:trust_proxy_default";
     app2.init = function init() {
-      var router7 = null;
+      var router8 = null;
       this.cache = /* @__PURE__ */ Object.create(null);
       this.engines = /* @__PURE__ */ Object.create(null);
       this.settings = /* @__PURE__ */ Object.create(null);
@@ -21122,13 +21122,13 @@ var require_application = __commonJS({
         configurable: true,
         enumerable: true,
         get: function getrouter() {
-          if (router7 === null) {
-            router7 = new Router7({
+          if (router8 === null) {
+            router8 = new Router8({
               caseSensitive: this.enabled("case sensitive routing"),
               strict: this.enabled("strict routing")
             });
           }
-          return router7;
+          return router8;
         }
       });
     };
@@ -21199,15 +21199,15 @@ var require_application = __commonJS({
       if (fns.length === 0) {
         throw new TypeError("app.use() requires a middleware function");
       }
-      var router7 = this.router;
+      var router8 = this.router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router7.use(path3, fn2);
+          return router8.use(path3, fn2);
         }
         debug(".use app under %s", path3);
         fn2.mountpath = path3;
         fn2.parent = this;
-        router7.use(path3, function mounted_app(req, res, next) {
+        router8.use(path3, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             Object.setPrototypeOf(req, orig.request);
@@ -22664,7 +22664,7 @@ var require_send = __commonJS({
     var escapeHtml = require_escape_html();
     var etag = require_etag();
     var fresh = require_fresh();
-    var fs = __require("fs");
+    var fs2 = __require("fs");
     var mime = require_mime_types();
     var ms = require_ms();
     var onFinished = require_on_finished();
@@ -22946,7 +22946,7 @@ var require_send = __commonJS({
       var i = 0;
       var self = this;
       debug('stat "%s"', path4);
-      fs.stat(path4, function onstat(err, stat) {
+      fs2.stat(path4, function onstat(err, stat) {
         var pathEndsWithSep = path4[path4.length - 1] === sep;
         if (err && err.code === "ENOENT" && !extname(path4) && !pathEndsWithSep) {
           return next(err);
@@ -22963,7 +22963,7 @@ var require_send = __commonJS({
         }
         var p = path4 + "." + self._extensions[i++];
         debug('stat "%s"', p);
-        fs.stat(p, function(err2, stat) {
+        fs2.stat(p, function(err2, stat) {
           if (err2) return next(err2);
           if (stat.isDirectory()) return next();
           self.emit("file", p, stat);
@@ -22981,7 +22981,7 @@ var require_send = __commonJS({
         }
         var p = join(path4, self._index[i]);
         debug('stat "%s"', p);
-        fs.stat(p, function(err2, stat) {
+        fs2.stat(p, function(err2, stat) {
           if (err2) return next(err2);
           if (stat.isDirectory()) return next();
           self.emit("file", p, stat);
@@ -22993,7 +22993,7 @@ var require_send = __commonJS({
     SendStream.prototype.stream = function stream(path4, options) {
       var self = this;
       var res = this.res;
-      var stream2 = fs.createReadStream(path4, options);
+      var stream2 = fs2.createReadStream(path4, options);
       this.emit("stream", stream2);
       stream2.pipe(res);
       function cleanup() {
@@ -23792,7 +23792,7 @@ var require_express = __commonJS({
     var EventEmitter = __require("node:events").EventEmitter;
     var mixin = require_merge_descriptors();
     var proto = require_application();
-    var Router7 = require_router();
+    var Router8 = require_router();
     var req = require_request();
     var res = require_response();
     exports = module.exports = createApplication;
@@ -23814,8 +23814,8 @@ var require_express = __commonJS({
     exports.application = proto;
     exports.request = req;
     exports.response = res;
-    exports.Route = Router7.Route;
-    exports.Router = Router7;
+    exports.Route = Router8.Route;
+    exports.Router = Router8;
     exports.json = bodyParser.json;
     exports.raw = bodyParser.raw;
     exports.static = require_serve_static();
@@ -25285,7 +25285,7 @@ var require_atomic_sleep = __commonJS({
 var require_sonic_boom = __commonJS({
   "../../node_modules/.pnpm/sonic-boom@4.2.1/node_modules/sonic-boom/index.js"(exports, module) {
     "use strict";
-    var fs = __require("fs");
+    var fs2 = __require("fs");
     var EventEmitter = __require("events");
     var inherits = __require("util").inherits;
     var path3 = __require("path");
@@ -25342,20 +25342,20 @@ var require_sonic_boom = __commonJS({
       const mode = sonic.mode;
       if (sonic.sync) {
         try {
-          if (sonic.mkdir) fs.mkdirSync(path3.dirname(file2), { recursive: true });
-          const fd = fs.openSync(file2, flags, mode);
+          if (sonic.mkdir) fs2.mkdirSync(path3.dirname(file2), { recursive: true });
+          const fd = fs2.openSync(file2, flags, mode);
           fileOpened(null, fd);
         } catch (err) {
           fileOpened(err);
           throw err;
         }
       } else if (sonic.mkdir) {
-        fs.mkdir(path3.dirname(file2), { recursive: true }, (err) => {
+        fs2.mkdir(path3.dirname(file2), { recursive: true }, (err) => {
           if (err) return fileOpened(err);
-          fs.open(file2, flags, mode, fileOpened);
+          fs2.open(file2, flags, mode, fileOpened);
         });
       } else {
-        fs.open(file2, flags, mode, fileOpened);
+        fs2.open(file2, flags, mode, fileOpened);
       }
     }
     function SonicBoom(opts) {
@@ -25396,8 +25396,8 @@ var require_sonic_boom = __commonJS({
         this.flush = flushBuffer;
         this.flushSync = flushBufferSync;
         this._actualWrite = actualWriteBuffer;
-        fsWriteSync = () => fs.writeSync(this.fd, this._writingBuf);
-        fsWrite = () => fs.write(this.fd, this._writingBuf, this.release);
+        fsWriteSync = () => fs2.writeSync(this.fd, this._writingBuf);
+        fsWrite = () => fs2.write(this.fd, this._writingBuf, this.release);
       } else if (contentMode === void 0 || contentMode === kContentModeUtf8) {
         this._writingBuf = "";
         this.write = write;
@@ -25406,15 +25406,15 @@ var require_sonic_boom = __commonJS({
         this._actualWrite = actualWrite;
         fsWriteSync = () => {
           if (Buffer.isBuffer(this._writingBuf)) {
-            return fs.writeSync(this.fd, this._writingBuf);
+            return fs2.writeSync(this.fd, this._writingBuf);
           }
-          return fs.writeSync(this.fd, this._writingBuf, "utf8");
+          return fs2.writeSync(this.fd, this._writingBuf, "utf8");
         };
         fsWrite = () => {
           if (Buffer.isBuffer(this._writingBuf)) {
-            return fs.write(this.fd, this._writingBuf, this.release);
+            return fs2.write(this.fd, this._writingBuf, this.release);
           }
-          return fs.write(this.fd, this._writingBuf, "utf8", this.release);
+          return fs2.write(this.fd, this._writingBuf, "utf8", this.release);
         };
       } else {
         throw new Error(`SonicBoom supports "${kContentModeUtf8}" and "${kContentModeBuffer}", but passed ${contentMode}`);
@@ -25471,7 +25471,7 @@ var require_sonic_boom = __commonJS({
           }
         }
         if (this._fsync) {
-          fs.fsyncSync(this.fd);
+          fs2.fsyncSync(this.fd);
         }
         const len = this._len;
         if (this._reopening) {
@@ -25585,7 +25585,7 @@ var require_sonic_boom = __commonJS({
       const onDrain = () => {
         if (!this._fsync) {
           try {
-            fs.fsync(this.fd, (err) => {
+            fs2.fsync(this.fd, (err) => {
               this._flushPending = false;
               cb(err);
             });
@@ -25687,7 +25687,7 @@ var require_sonic_boom = __commonJS({
       const fd = this.fd;
       this.once("ready", () => {
         if (fd !== this.fd) {
-          fs.close(fd, (err) => {
+          fs2.close(fd, (err) => {
             if (err) {
               return this.emit("error", err);
             }
@@ -25736,7 +25736,7 @@ var require_sonic_boom = __commonJS({
           buf = this._bufs[0];
         }
         try {
-          const n = Buffer.isBuffer(buf) ? fs.writeSync(this.fd, buf) : fs.writeSync(this.fd, buf, "utf8");
+          const n = Buffer.isBuffer(buf) ? fs2.writeSync(this.fd, buf) : fs2.writeSync(this.fd, buf, "utf8");
           const releasedBufObj = releaseWritingBuf(buf, this._len, n);
           buf = releasedBufObj.writingBuf;
           this._len = releasedBufObj.len;
@@ -25752,7 +25752,7 @@ var require_sonic_boom = __commonJS({
         }
       }
       try {
-        fs.fsyncSync(this.fd);
+        fs2.fsyncSync(this.fd);
       } catch {
       }
     }
@@ -25773,7 +25773,7 @@ var require_sonic_boom = __commonJS({
           buf = mergeBuf(this._bufs[0], this._lens[0]);
         }
         try {
-          const n = fs.writeSync(this.fd, buf);
+          const n = fs2.writeSync(this.fd, buf);
           buf = buf.subarray(n);
           this._len = Math.max(this._len - n, 0);
           if (buf.length <= 0) {
@@ -25801,13 +25801,13 @@ var require_sonic_boom = __commonJS({
       this._writingBuf = this._writingBuf.length ? this._writingBuf : this._bufs.shift() || "";
       if (this.sync) {
         try {
-          const written = Buffer.isBuffer(this._writingBuf) ? fs.writeSync(this.fd, this._writingBuf) : fs.writeSync(this.fd, this._writingBuf, "utf8");
+          const written = Buffer.isBuffer(this._writingBuf) ? fs2.writeSync(this.fd, this._writingBuf) : fs2.writeSync(this.fd, this._writingBuf, "utf8");
           release(null, written);
         } catch (err) {
           release(err);
         }
       } else {
-        fs.write(this.fd, this._writingBuf, release);
+        fs2.write(this.fd, this._writingBuf, release);
       }
     }
     function actualWriteBuffer() {
@@ -25816,7 +25816,7 @@ var require_sonic_boom = __commonJS({
       this._writingBuf = this._writingBuf.length ? this._writingBuf : mergeBuf(this._bufs.shift(), this._lens.shift());
       if (this.sync) {
         try {
-          const written = fs.writeSync(this.fd, this._writingBuf);
+          const written = fs2.writeSync(this.fd, this._writingBuf);
           release(null, written);
         } catch (err) {
           release(err);
@@ -25825,7 +25825,7 @@ var require_sonic_boom = __commonJS({
         if (kCopyBuffer) {
           this._writingBuf = Buffer.from(this._writingBuf);
         }
-        fs.write(this.fd, this._writingBuf, release);
+        fs2.write(this.fd, this._writingBuf, release);
       }
     }
     function actualClose(sonic) {
@@ -25841,12 +25841,12 @@ var require_sonic_boom = __commonJS({
       sonic._lens = [];
       assert2(typeof sonic.fd === "number", `sonic.fd must be a number, got ${typeof sonic.fd}`);
       try {
-        fs.fsync(sonic.fd, closeWrapped);
+        fs2.fsync(sonic.fd, closeWrapped);
       } catch {
       }
       function closeWrapped() {
         if (sonic.fd !== 1 && sonic.fd !== 2) {
-          fs.close(sonic.fd, done);
+          fs2.close(sonic.fd, done);
         } else {
           done();
         }
@@ -29107,8 +29107,8 @@ var require_node2 = __commonJS({
           }
           break;
         case "FILE":
-          var fs = __require("fs");
-          stream2 = new fs.SyncWriteStream(fd2, { autoClose: false });
+          var fs2 = __require("fs");
+          stream2 = new fs2.SyncWriteStream(fd2, { autoClose: false });
           stream2._type = "fs";
           break;
         case "PIPE":
@@ -33118,7 +33118,7 @@ var require_websocket = __commonJS({
     var http = __require("http");
     var net = __require("net");
     var tls = __require("tls");
-    var { randomBytes: randomBytes2, createHash: createHash2 } = __require("crypto");
+    var { randomBytes: randomBytes2, createHash: createHash3 } = __require("crypto");
     var { Duplex, Readable } = __require("stream");
     var { URL: URL2 } = __require("url");
     var PerMessageDeflate2 = require_permessage_deflate();
@@ -33786,7 +33786,7 @@ var require_websocket = __commonJS({
           abortHandshake(websocket, socket, "Invalid Upgrade header");
           return;
         }
-        const digest = createHash2("sha1").update(key + GUID).digest("base64");
+        const digest = createHash3("sha1").update(key + GUID).digest("base64");
         if (res.headers["sec-websocket-accept"] !== digest) {
           abortHandshake(websocket, socket, "Invalid Sec-WebSocket-Accept header");
           return;
@@ -34155,7 +34155,7 @@ var require_websocket_server = __commonJS({
     var EventEmitter = __require("events");
     var http = __require("http");
     var { Duplex } = __require("stream");
-    var { createHash: createHash2 } = __require("crypto");
+    var { createHash: createHash3 } = __require("crypto");
     var extension2 = require_extension();
     var PerMessageDeflate2 = require_permessage_deflate();
     var subprotocol2 = require_subprotocol();
@@ -34462,7 +34462,7 @@ var require_websocket_server = __commonJS({
           );
         }
         if (this._state > RUNNING) return abortHandshake(socket, 503);
-        const digest = createHash2("sha1").update(key + GUID).digest("base64");
+        const digest = createHash3("sha1").update(key + GUID).digest("base64");
         const headers = [
           "HTTP/1.1 101 Switching Protocols",
           "Upgrade: websocket",
@@ -57378,6 +57378,26 @@ var init_events = __esm({
   }
 });
 
+// ../../lib/db/src/schema/users.ts
+var usersTable, insertUserSchema;
+var init_users = __esm({
+  "../../lib/db/src/schema/users.ts"() {
+    "use strict";
+    init_sqlite_core();
+    init_drizzle_zod();
+    usersTable = sqliteTable("users", {
+      id: integer("id").primaryKey({ autoIncrement: true }),
+      name: text("name").notNull(),
+      email: text("email").notNull().unique(),
+      phone: text("phone").notNull(),
+      department: text("department").notNull(),
+      passwordHash: text("password_hash").notNull(),
+      createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => /* @__PURE__ */ new Date())
+    });
+    insertUserSchema = createInsertSchema(usersTable).omit({ id: true, createdAt: true });
+  }
+});
+
 // ../../lib/db/src/schema/requests.ts
 var attendanceRequestsTable, insertAttendanceRequestSchema;
 var init_requests = __esm({
@@ -57386,9 +57406,11 @@ var init_requests = __esm({
     init_sqlite_core();
     init_drizzle_zod();
     init_events();
+    init_users();
     attendanceRequestsTable = sqliteTable("attendance_requests", {
       id: integer("id").primaryKey({ autoIncrement: true }),
       eventId: integer("event_id").notNull().references(() => eventsTable.id),
+      userId: integer("user_id").references(() => usersTable.id),
       name: text("name").notNull(),
       phone: text("phone").notNull(),
       email: text("email").notNull(),
@@ -57396,6 +57418,8 @@ var init_requests = __esm({
       heardAbout: text("heard_about"),
       mutualConnection: text("mutual_connection"),
       whyAttend: text("why_attend"),
+      department: text("department"),
+      attendancePossibility: text("attendance_possibility"),
       status: text("status", { enum: ["pending", "approved", "declined", "waitlisted"] }).notNull().default("pending"),
       ticketCode: text("ticket_code"),
       checkedIn: integer("checked_in", { mode: "boolean" }).notNull().default(false),
@@ -57470,7 +57494,9 @@ __export(schema_exports, {
   insertAdminSchema: () => insertAdminSchema,
   insertAttendanceRequestSchema: () => insertAttendanceRequestSchema,
   insertEventSchema: () => insertEventSchema,
-  insertGuestSchema: () => insertGuestSchema
+  insertGuestSchema: () => insertGuestSchema,
+  insertUserSchema: () => insertUserSchema,
+  usersTable: () => usersTable
 });
 var init_schema = __esm({
   "../../lib/db/src/schema/index.ts"() {
@@ -57479,6 +57505,7 @@ var init_schema = __esm({
     init_requests();
     init_guests();
     init_admins();
+    init_users();
   }
 });
 
@@ -57488,15 +57515,124 @@ __export(src_exports, {
   adminsTable: () => adminsTable,
   attendanceRequestsTable: () => attendanceRequestsTable,
   db: () => db,
+  ensureDatabaseSchema: () => ensureDatabaseSchema,
   eventsTable: () => eventsTable,
   guestsTable: () => guestsTable,
   insertAdminSchema: () => insertAdminSchema,
   insertAttendanceRequestSchema: () => insertAttendanceRequestSchema,
   insertEventSchema: () => insertEventSchema,
-  insertGuestSchema: () => insertGuestSchema
+  insertGuestSchema: () => insertGuestSchema,
+  insertUserSchema: () => insertUserSchema,
+  sqlite: () => sqlite,
+  usersTable: () => usersTable
 });
 import path from "path";
-var isApiServer, defaultDbPath, url2, sqlite, db;
+async function ensureDatabaseSchema() {
+  try {
+    await sqlite.execute(`
+      CREATE TABLE IF NOT EXISTS admins (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        name TEXT NOT NULL,
+        created_at INTEGER NOT NULL
+      );
+    `);
+    await sqlite.execute(`
+      CREATE TABLE IF NOT EXISTS events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        edition_number INTEGER NOT NULL,
+        date INTEGER NOT NULL,
+        city TEXT NOT NULL,
+        venue TEXT,
+        capacity INTEGER NOT NULL DEFAULT 25,
+        price REAL NOT NULL DEFAULT 0,
+        original_price REAL,
+        offer_text TEXT,
+        status TEXT NOT NULL DEFAULT 'upcoming',
+        rsvp_link TEXT,
+        created_at INTEGER NOT NULL
+      );
+    `);
+    await sqlite.execute(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        phone TEXT NOT NULL,
+        department TEXT NOT NULL,
+        password_hash TEXT NOT NULL,
+        created_at INTEGER NOT NULL
+      );
+    `);
+    await sqlite.execute(`
+      CREATE TABLE IF NOT EXISTS attendance_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        user_id INTEGER,
+        name TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        email TEXT NOT NULL,
+        department TEXT,
+        social_handle TEXT,
+        heard_about TEXT,
+        mutual_connection TEXT,
+        why_attend TEXT,
+        attendance_possibility TEXT,
+        status TEXT NOT NULL DEFAULT 'pending',
+        ticket_code TEXT,
+        checked_in INTEGER NOT NULL DEFAULT 0,
+        created_at INTEGER NOT NULL
+      );
+    `);
+    await sqlite.execute(`
+      CREATE TABLE IF NOT EXISTS guests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        request_id INTEGER NOT NULL,
+        event_id INTEGER NOT NULL,
+        name TEXT NOT NULL DEFAULT '',
+        phone TEXT NOT NULL DEFAULT '',
+        email TEXT NOT NULL DEFAULT '',
+        ticket_code TEXT NOT NULL DEFAULT '',
+        status TEXT NOT NULL DEFAULT 'confirmed',
+        checked_in INTEGER NOT NULL DEFAULT 0,
+        checked_in_at INTEGER,
+        created_at INTEGER NOT NULL
+      );
+    `);
+    const migrations = [
+      "ALTER TABLE events ADD COLUMN original_price REAL",
+      "ALTER TABLE events ADD COLUMN offer_text TEXT",
+      "ALTER TABLE events ADD COLUMN rsvp_link TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN user_id INTEGER",
+      "ALTER TABLE attendance_requests ADD COLUMN social_handle TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN heard_about TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN mutual_connection TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN why_attend TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN department TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN attendance_possibility TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN ticket_code TEXT",
+      "ALTER TABLE attendance_requests ADD COLUMN checked_in INTEGER NOT NULL DEFAULT 0",
+      "ALTER TABLE guests ADD COLUMN name TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE guests ADD COLUMN phone TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE guests ADD COLUMN email TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE guests ADD COLUMN ticket_code TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE guests ADD COLUMN status TEXT NOT NULL DEFAULT 'confirmed'",
+      "ALTER TABLE guests ADD COLUMN checked_in INTEGER NOT NULL DEFAULT 0",
+      "ALTER TABLE guests ADD COLUMN checked_in_at INTEGER"
+    ];
+    for (const sql2 of migrations) {
+      try {
+        await sqlite.execute(sql2);
+      } catch (e) {
+      }
+    }
+  } catch (err) {
+    console.error("\u26A0\uFE0F Failed to ensure database schema:", err);
+  }
+}
+var dbPath, url2, sqlite, db;
 var init_src = __esm({
   "../../lib/db/src/index.ts"() {
     "use strict";
@@ -57504,22 +57640,23 @@ var init_src = __esm({
     init_node3();
     init_schema();
     init_schema();
-    isApiServer = process.cwd().includes("api-server");
-    defaultDbPath = isApiServer ? `file:${path.resolve(process.cwd(), "../../lib/db/sqlite.db").replace(/\\/g, "/")}` : "file:sqlite.db";
-    url2 = process.env.DATABASE_URL || defaultDbPath;
+    dbPath = path.resolve(process.cwd(), "lib/db/sqlite.db").replace(/\\/g, "/");
+    url2 = process.env.DATABASE_URL || `file:${dbPath}`;
     sqlite = createClient({ url: url2 });
     db = drizzle(sqlite, { schema: schema_exports });
+    ensureDatabaseSchema().catch(() => {
+    });
   }
 });
 
 // src/app.ts
-var import_express7 = __toESM(require_express2(), 1);
+var import_express8 = __toESM(require_express2(), 1);
 var import_cors = __toESM(require_lib3(), 1);
 var import_pino_http = __toESM(require_logger(), 1);
 var import_express_session = __toESM(require_express_session(), 1);
 
 // src/routes/index.ts
-var import_express6 = __toESM(require_express2(), 1);
+var import_express7 = __toESM(require_express2(), 1);
 
 // src/routes/health.ts
 var import_express = __toESM(require_express2(), 1);
@@ -61411,6 +61548,57 @@ var coerce = {
 };
 
 // ../../lib/api-zod/src/generated/api.ts
+var userSignUpBodyNameMin = 2;
+var userSignUpBodyPhoneMin = 10;
+var userSignUpBodyPasswordMin = 4;
+var UserSignUpBody = objectType({
+  "name": stringType().min(userSignUpBodyNameMin),
+  "department": stringType(),
+  "phone": stringType().min(userSignUpBodyPhoneMin),
+  "email": stringType(),
+  "password": stringType().min(userSignUpBodyPasswordMin)
+});
+var UserSignUpResponse = objectType({
+  "id": numberType(),
+  "name": stringType(),
+  "department": stringType(),
+  "phone": stringType(),
+  "email": stringType()
+});
+var UserLoginBody = objectType({
+  "email": stringType(),
+  "password": stringType()
+});
+var UserLoginResponse = objectType({
+  "id": numberType(),
+  "name": stringType(),
+  "department": stringType(),
+  "phone": stringType(),
+  "email": stringType()
+});
+var UserLogoutResponse = unknownType();
+var GetUserMeResponse = objectType({
+  "id": numberType(),
+  "name": stringType(),
+  "department": stringType(),
+  "phone": stringType(),
+  "email": stringType()
+});
+var GetUserPassesResponseItem = objectType({
+  "id": numberType(),
+  "eventId": numberType(),
+  "eventTitle": stringType(),
+  "eventDate": stringType(),
+  "eventVenue": stringType().nullable(),
+  "status": enumType(["pending", "approved", "declined", "waitlisted"]),
+  "ticketCode": stringType().nullish(),
+  "name": stringType(),
+  "department": stringType().nullable(),
+  "attendancePossibility": stringType().nullish(),
+  "checkedIn": booleanType().optional(),
+  "createdAt": stringType()
+});
+var GetUserPassesResponse = arrayType(GetUserPassesResponseItem);
 var HealthCheckResponse = objectType({
   "status": stringType()
 });
@@ -61474,6 +61662,8 @@ var ListRequestsResponseItem = objectType({
   "heardAbout": stringType().nullish(),
   "mutualConnection": stringType().nullish(),
   "whyAttend": stringType().nullish(),
+  "department": stringType().nullish(),
+  "attendancePossibility": stringType().nullish(),
   "status": enumType(["pending", "approved", "declined", "waitlisted"]),
   "ticketCode": stringType().nullish(),
   "checkedIn": booleanType().optional(),
@@ -61490,7 +61680,9 @@ var CreateRequestBody = objectType({
   "socialHandle": stringType().optional(),
   "heardAbout": stringType().optional(),
   "mutualConnection": stringType().optional(),
-  "whyAttend": stringType().optional()
+  "whyAttend": stringType().optional(),
+  "department": stringType().optional(),
+  "attendancePossibility": stringType().optional()
 });
 var CreateRequestResponse = objectType({
   "id": numberType(),
@@ -61502,6 +61694,8 @@ var CreateRequestResponse = objectType({
   "heardAbout": stringType().nullish(),
   "mutualConnection": stringType().nullish(),
   "whyAttend": stringType().nullish(),
+  "department": stringType().nullish(),
+  "attendancePossibility": stringType().nullish(),
   "status": enumType(["pending", "approved", "declined", "waitlisted"]),
   "ticketCode": stringType().nullish(),
   "checkedIn": booleanType().optional(),
@@ -61520,6 +61714,8 @@ var GetRequestResponse = objectType({
   "heardAbout": stringType().nullish(),
   "mutualConnection": stringType().nullish(),
   "whyAttend": stringType().nullish(),
+  "department": stringType().nullish(),
+  "attendancePossibility": stringType().nullish(),
   "status": enumType(["pending", "approved", "declined", "waitlisted"]),
   "ticketCode": stringType().nullish(),
   "checkedIn": booleanType().optional(),
@@ -61541,6 +61737,8 @@ var UpdateRequestStatusResponse = objectType({
   "heardAbout": stringType().nullish(),
   "mutualConnection": stringType().nullish(),
   "whyAttend": stringType().nullish(),
+  "department": stringType().nullish(),
+  "attendancePossibility": stringType().nullish(),
   "status": enumType(["pending", "approved", "declined", "waitlisted"]),
   "ticketCode": stringType().nullish(),
   "checkedIn": booleanType().optional(),
@@ -61688,9 +61886,22 @@ function generateTicketCode() {
   return "SKN-" + randomBytes(4).toString("hex").toUpperCase();
 }
 function serializeRequest(r) {
+  if (!r) return r;
+  let createdAtStr;
+  try {
+    if (r.createdAt instanceof Date) {
+      createdAtStr = r.createdAt.toISOString();
+    } else if (r.createdAt) {
+      createdAtStr = new Date(r.createdAt).toISOString();
+    } else {
+      createdAtStr = (/* @__PURE__ */ new Date()).toISOString();
+    }
+  } catch {
+    createdAtStr = (/* @__PURE__ */ new Date()).toISOString();
+  }
   return {
     ...r,
-    createdAt: r.createdAt.toISOString()
+    createdAt: createdAtStr
   };
 }
 router3.get("/requests", async (req, res) => {
@@ -61702,31 +61913,59 @@ router3.get("/requests", async (req, res) => {
     if (status) rows = rows.filter((r) => r.status === status);
     return res.json(rows.map((r) => serializeRequest(r)));
   } catch (err) {
-    req.log.error({ err }, "Failed to list requests");
+    req.log.error({ err, message: err?.message, stack: err?.stack }, "Failed to list requests");
     return res.status(500).json({ error: "Internal server error" });
   }
 });
 router3.post("/requests", async (req, res) => {
-  const { eventId, name, phone, email: email3, socialHandle, heardAbout, mutualConnection, whyAttend } = req.body;
+  const { eventId, name, phone, email: email3, socialHandle, heardAbout, mutualConnection, whyAttend, department, attendancePossibility } = req.body;
   if (!eventId || !name || !phone || !email3) {
     return res.status(400).json({ error: "eventId, name, phone, and email are required" });
   }
+  const sessionUser = req.session?.user;
+  const cleanEmail = email3.toLowerCase().trim();
+  const cleanPhone = phone.trim();
   try {
+    const existing = await db.select().from(attendanceRequestsTable).where(
+      and(
+        eq(attendanceRequestsTable.eventId, Number(eventId)),
+        or(
+          eq(attendanceRequestsTable.email, cleanEmail),
+          eq(attendanceRequestsTable.phone, cleanPhone)
+        )
+      )
+    );
+    if (existing.length > 0) {
+      const [updated] = await db.update(attendanceRequestsTable).set({
+        name: name.trim(),
+        phone: phone.trim(),
+        department: department || existing[0].department,
+        attendancePossibility: attendancePossibility || existing[0].attendancePossibility,
+        userId: sessionUser?.id || existing[0].userId
+      }).where(eq(attendanceRequestsTable.id, existing[0].id)).returning();
+      return res.json({
+        ...serializeRequest(updated),
+        isDuplicate: true
+      });
+    }
     const [request] = await db.insert(attendanceRequestsTable).values({
       eventId: Number(eventId),
-      name,
-      phone,
-      email: email3,
+      userId: sessionUser?.id || null,
+      name: name.trim(),
+      phone: phone.trim(),
+      email: cleanEmail,
       socialHandle: socialHandle || null,
       heardAbout: heardAbout || null,
       mutualConnection: mutualConnection || null,
       whyAttend: whyAttend || null,
+      department: department || null,
+      attendancePossibility: attendancePossibility || null,
       status: "pending"
     }).returning();
     return res.status(201).json(serializeRequest(request));
   } catch (err) {
-    req.log.error({ err }, "Failed to create request");
-    return res.status(500).json({ error: "Internal server error" });
+    req.log.error({ err, message: err?.message, stack: err?.stack }, "Failed to create request");
+    return res.status(500).json({ error: "Internal server error: " + (err?.message || "Failed to save registration") });
   }
 });
 router3.get("/requests/:id", async (req, res) => {
@@ -61880,16 +62119,273 @@ router5.patch("/admin/events/:id", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+router5.get("/admin/users", async (req, res) => {
+  if (!req.session?.admin) return res.status(401).json({ error: "Unauthorized" });
+  try {
+    const { usersTable: usersTable2, attendanceRequestsTable: attendanceRequestsTable2 } = await Promise.resolve().then(() => (init_src(), src_exports));
+    const signedUpUsers = await db.select({
+      id: usersTable2.id,
+      name: usersTable2.name,
+      email: usersTable2.email,
+      phone: usersTable2.phone,
+      department: usersTable2.department,
+      createdAt: usersTable2.createdAt
+    }).from(usersTable2);
+    const userMap = /* @__PURE__ */ new Map();
+    signedUpUsers.forEach((u) => {
+      let isoDate;
+      try {
+        const d = u.createdAt instanceof Date ? u.createdAt : new Date(u.createdAt);
+        isoDate = !isNaN(d.getTime()) ? d.toISOString() : (/* @__PURE__ */ new Date()).toISOString();
+      } catch {
+        isoDate = (/* @__PURE__ */ new Date()).toISOString();
+      }
+      const cleanEmail = u.email.toLowerCase().trim();
+      userMap.set(cleanEmail, {
+        ...u,
+        createdAt: isoDate,
+        isSignedUp: true
+      });
+    });
+    const requests = await db.select().from(attendanceRequestsTable2);
+    requests.forEach((r) => {
+      const cleanEmail = r.email.toLowerCase().trim();
+      if (!userMap.has(cleanEmail)) {
+        let isoDate;
+        try {
+          const d = r.createdAt instanceof Date ? r.createdAt : new Date(r.createdAt);
+          isoDate = !isNaN(d.getTime()) ? d.toISOString() : (/* @__PURE__ */ new Date()).toISOString();
+        } catch {
+          isoDate = (/* @__PURE__ */ new Date()).toISOString();
+        }
+        userMap.set(cleanEmail, {
+          id: r.id,
+          // request id fallback
+          name: r.name,
+          email: r.email,
+          phone: r.phone,
+          department: r.department || "PGIMER",
+          createdAt: isoDate,
+          isSignedUp: false,
+          status: r.status
+        });
+      }
+    });
+    const combinedList = Array.from(userMap.values());
+    return res.json(combinedList);
+  } catch (err) {
+    req.log.error({ err }, "Failed to list registered users");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+router5.delete("/admin/users/:id", async (req, res) => {
+  if (!req.session?.admin) return res.status(401).json({ error: "Unauthorized" });
+  const id = Number(req.params.id);
+  if (!id) return res.status(400).json({ error: "Invalid user ID" });
+  try {
+    const { usersTable: usersTable2, attendanceRequestsTable: attendanceRequestsTable2 } = await Promise.resolve().then(() => (init_src(), src_exports));
+    await db.update(attendanceRequestsTable2).set({ userId: null }).where(eq(attendanceRequestsTable2.userId, id));
+    await db.delete(usersTable2).where(eq(usersTable2.id, id));
+    return res.json({ message: "User deleted" });
+  } catch (err) {
+    req.log.error({ err }, "Failed to delete user");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
 var admin_default = router5;
 
-// src/routes/index.ts
+// src/routes/user.ts
+var import_express6 = __toESM(require_express2(), 1);
+init_src();
+init_src();
+init_drizzle_orm();
+import { createHash as createHash2 } from "crypto";
 var router6 = (0, import_express6.Router)();
-router6.use(health_default);
-router6.use(events_default);
-router6.use(requests_default);
-router6.use(guests_default);
-router6.use(admin_default);
-var routes_default = router6;
+function hashPassword2(password) {
+  return createHash2("sha256").update(password + "sukoon-salt-2026").digest("hex");
+}
+function serializeUser(user) {
+  return {
+    id: user.id,
+    name: user.name,
+    department: user.department,
+    phone: user.phone,
+    email: user.email
+  };
+}
+router6.post("/user/signup", async (req, res) => {
+  const { name, department, phone, email: email3, password } = req.body;
+  if (!name || !department || !phone || !email3 || !password) {
+    return res.status(400).json({ error: "Name, department, phone, email, and password are required" });
+  }
+  const cleanEmail = email3.toLowerCase().trim();
+  const cleanPhone = phone.trim();
+  try {
+    const existing = await db.select().from(usersTable).where(eq(usersTable.email, cleanEmail));
+    if (existing.length > 0) {
+      return res.status(400).json({ error: "An account with this email already exists. Please log in." });
+    }
+    const [user] = await db.insert(usersTable).values({
+      name: name.trim(),
+      department: department.trim(),
+      phone: cleanPhone,
+      email: cleanEmail,
+      passwordHash: hashPassword2(password)
+    }).returning();
+    await db.update(attendanceRequestsTable).set({ userId: user.id }).where(
+      or(
+        eq(attendanceRequestsTable.email, cleanEmail),
+        eq(attendanceRequestsTable.phone, cleanPhone)
+      )
+    );
+    req.session.user = serializeUser(user);
+    return res.status(201).json(serializeUser(user));
+  } catch (err) {
+    req.log.error({ err }, "Failed to register user");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+router6.post("/user/login", async (req, res) => {
+  const { email: email3, password } = req.body;
+  if (!email3 || !password) {
+    return res.status(400).json({ error: "Email and password are required" });
+  }
+  const cleanEmail = email3.toLowerCase().trim();
+  try {
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.email, cleanEmail));
+    if (!user || user.passwordHash !== hashPassword2(password)) {
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
+    await db.update(attendanceRequestsTable).set({ userId: user.id }).where(
+      or(
+        eq(attendanceRequestsTable.email, cleanEmail),
+        eq(attendanceRequestsTable.phone, user.phone)
+      )
+    );
+    const sessionUser = serializeUser(user);
+    req.session.user = sessionUser;
+    return res.json(sessionUser);
+  } catch (err) {
+    req.log.error({ err }, "Failed to login user");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+function normalizePhone(p) {
+  if (!p) return "";
+  const digits = p.replace(/\D/g, "");
+  return digits.length >= 10 ? digits.slice(-10) : digits;
+}
+router6.post("/user/reset-password", async (req, res) => {
+  const { email: email3, phone, newPassword } = req.body;
+  if (!email3 || !phone || !newPassword) {
+    return res.status(400).json({ error: "Email, registered phone number, and new password are required." });
+  }
+  const cleanEmail = email3.toLowerCase().trim();
+  const cleanPhone = phone.trim();
+  const normInputPhone = normalizePhone(cleanPhone);
+  if (!normInputPhone || normInputPhone.length < 10) {
+    return res.status(400).json({ error: "Please enter a valid 10-digit registered phone number." });
+  }
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: "New password must be at least 6 characters long." });
+  }
+  try {
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.email, cleanEmail));
+    if (user) {
+      const userNormPhone = normalizePhone(user.phone);
+      if (userNormPhone !== normInputPhone) {
+        return res.status(400).json({
+          error: "The entered phone number does not match the registered phone number for this email account."
+        });
+      }
+      await db.update(usersTable).set({ passwordHash: hashPassword2(newPassword) }).where(eq(usersTable.id, user.id));
+      return res.json({ message: "Password reset successful! Please log in with your new password." });
+    }
+    const [request] = await db.select().from(attendanceRequestsTable).where(eq(attendanceRequestsTable.email, cleanEmail));
+    if (request) {
+      const requestNormPhone = normalizePhone(request.phone);
+      if (requestNormPhone !== normInputPhone) {
+        return res.status(400).json({
+          error: "The entered phone number does not match the registered phone number for this email account."
+        });
+      }
+      const [newUser] = await db.insert(usersTable).values({
+        name: request.name,
+        department: request.department || "PGIMER",
+        phone: request.phone,
+        email: request.email,
+        passwordHash: hashPassword2(newPassword)
+      }).returning();
+      await db.update(attendanceRequestsTable).set({ userId: newUser.id }).where(eq(attendanceRequestsTable.id, request.id));
+      return res.json({ message: "Password set & account created successfully! Please sign in with your new password." });
+    }
+    return res.status(404).json({ error: "No registered user account or event pass found for this email address." });
+  } catch (err) {
+    req.log.error({ err }, "Failed to reset user password");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+router6.post("/user/logout", (req, res) => {
+  delete req.session.user;
+  return res.json({ message: "Logged out" });
+});
+router6.get("/user/me", (req, res) => {
+  const user = req.session?.user;
+  if (!user) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  return res.json(user);
+});
+router6.get("/user/passes", async (req, res) => {
+  const user = req.session?.user;
+  if (!user) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  try {
+    const cleanEmail = user.email ? user.email.toLowerCase().trim() : "";
+    const cleanPhone = user.phone ? user.phone.trim() : "";
+    req.log.info({ sessionUser: user, cleanEmail, cleanPhone }, "GET /user/passes \u2014 session user");
+    const conditions = [];
+    if (user.id) conditions.push(eq(attendanceRequestsTable.userId, user.id));
+    if (cleanEmail) conditions.push(eq(attendanceRequestsTable.email, cleanEmail));
+    if (cleanPhone) conditions.push(eq(attendanceRequestsTable.phone, cleanPhone));
+    req.log.info({ conditionCount: conditions.length, hasId: !!user.id, hasEmail: !!cleanEmail, hasPhone: !!cleanPhone }, "GET /user/passes \u2014 conditions");
+    const requests = await db.select({
+      request: attendanceRequestsTable,
+      event: eventsTable
+    }).from(attendanceRequestsTable).innerJoin(eventsTable, eq(attendanceRequestsTable.eventId, eventsTable.id)).where(conditions.length > 0 ? or(...conditions) : eq(attendanceRequestsTable.id, -1)).orderBy(desc(attendanceRequestsTable.createdAt));
+    req.log.info({ resultCount: requests.length }, "GET /user/passes \u2014 query results");
+    const passes = requests.map(({ request, event }) => ({
+      id: request.id,
+      eventId: event.id,
+      eventTitle: event.title,
+      eventDate: event.date.toISOString(),
+      eventVenue: event.venue,
+      status: request.status,
+      ticketCode: request.ticketCode,
+      name: request.name,
+      department: request.department || user.department,
+      attendancePossibility: request.attendancePossibility,
+      checkedIn: request.checkedIn,
+      createdAt: request.createdAt.toISOString()
+    }));
+    return res.json(passes);
+  } catch (err) {
+    req.log.error({ err }, "Failed to fetch user passes");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+var user_default = router6;
+
+// src/routes/index.ts
+var router7 = (0, import_express7.Router)();
+router7.use(health_default);
+router7.use(events_default);
+router7.use(requests_default);
+router7.use(guests_default);
+router7.use(admin_default);
+router7.use(user_default);
+var routes_default = router7;
 
 // src/lib/logger.ts
 var import_pino = __toESM(require_pino(), 1);
@@ -61910,8 +62406,9 @@ var logger = (0, import_pino.default)({
 });
 
 // src/app.ts
+import fs from "fs";
 import path2 from "path";
-var app = (0, import_express7.default)();
+var app = (0, import_express8.default)();
 app.use(
   (0, import_pino_http.default)({
     logger,
@@ -61937,8 +62434,8 @@ app.use(
     credentials: true
   })
 );
-app.use(import_express7.default.json());
-app.use(import_express7.default.urlencoded({ extended: true }));
+app.use(import_express8.default.json());
+app.use(import_express8.default.urlencoded({ extended: true }));
 var sessionSecret = process.env.SESSION_SECRET || "sukoon-local-dev-secret-2026";
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
@@ -61957,25 +62454,31 @@ app.use(
   })
 );
 app.use("/api", routes_default);
-var frontendPath = process.env.NODE_ENV === "production" ? path2.resolve(process.cwd(), "public") : path2.resolve(__dirname, "../../sukoon/dist/public");
-app.use(import_express7.default.static(frontendPath));
-app.get(/(.*)/, (req, res) => {
-  res.sendFile(path2.resolve(frontendPath, "index.html"));
+var possibleFrontendPaths = [
+  path2.resolve(process.cwd(), "public"),
+  path2.resolve(__dirname, "../../public"),
+  path2.resolve(__dirname, "../../../public"),
+  path2.resolve(__dirname, "../../sukoon/dist/public")
+];
+var frontendPath = possibleFrontendPaths.find((p) => fs.existsSync(path2.join(p, "index.html"))) || possibleFrontendPaths[0];
+app.use(import_express8.default.static(frontendPath));
+app.use((req, res, next) => {
+  if (req.method === "GET" && !req.path.startsWith("/api")) {
+    const indexPath = path2.resolve(frontendPath, "index.html");
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    } else {
+      return res.status(200).send("<h1>Sukoon API Server Running</h1>");
+    }
+  }
+  next();
 });
 var app_default = app;
 
 // src/index.ts
-var rawPort = process.env["PORT"] || "3001";
-var port = Number(rawPort);
-if (Number.isNaN(port) || port <= 0) {
-  throw new Error(`Invalid PORT value: "${rawPort}"`);
-}
-app_default.listen(port, (err) => {
-  if (err) {
-    logger.error({ err }, "Error listening on port");
-    process.exit(1);
-  }
-  logger.info({ port }, "Server listening");
+var port = Number(process.env.PORT) || 3e3;
+app_default.listen(port, () => {
+  logger.info({ port }, `Sukoon server listening on port ${port}`);
 });
 /*! Bundled license information:
 

@@ -11,9 +11,23 @@ function generateTicketCode(): string {
 }
 
 function serializeRequest(r: typeof attendanceRequestsTable.$inferSelect) {
+  if (!r) return r;
+  let createdAtStr: string;
+  try {
+    if (r.createdAt instanceof Date) {
+      createdAtStr = r.createdAt.toISOString();
+    } else if (r.createdAt) {
+      createdAtStr = new Date(r.createdAt).toISOString();
+    } else {
+      createdAtStr = new Date().toISOString();
+    }
+  } catch {
+    createdAtStr = new Date().toISOString();
+  }
+
   return {
     ...r,
-    createdAt: r.createdAt.toISOString(),
+    createdAt: createdAtStr,
   };
 }
 
@@ -28,8 +42,8 @@ router.get("/requests", async (req, res) => {
     if (eventId) rows = rows.filter((r: any) => r.eventId === Number(eventId));
     if (status) rows = rows.filter((r: any) => r.status === status);
     return res.json(rows.map((r: any) => serializeRequest(r)));
-  } catch (err) {
-    req.log.error({ err }, "Failed to list requests");
+  } catch (err: any) {
+    req.log.error({ err, message: err?.message, stack: err?.stack }, "Failed to list requests");
     return res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -98,9 +112,9 @@ router.post("/requests", async (req, res) => {
       .returning();
 
     return res.status(201).json(serializeRequest(request));
-  } catch (err) {
-    req.log.error({ err }, "Failed to create request");
-    return res.status(500).json({ error: "Internal server error" });
+  } catch (err: any) {
+    req.log.error({ err, message: err?.message, stack: err?.stack }, "Failed to create request");
+    return res.status(500).json({ error: "Internal server error: " + (err?.message || "Failed to save registration") });
   }
 });
 
