@@ -90,4 +90,95 @@ router.patch("/admin/events/:id", async (req, res) => {
   }
 });
 
+// GET /admin/users - List all registered accounts (users + event registrants)
+router.get("/admin/users", async (req, res) => {
+  if (!(req.session as any)?.admin) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const { usersTable, attendanceRequestsTable } = await import("@workspace/db");
+
+    // 1. Get explicit signed-up user accounts
+    const signedUpUsers = await db.select({
+      id: usersTable.id,
+      name: usersTable.name,
+      email: usersTable.email,
+      phone: usersTable.phone,
+      department: usersTable.department,
+      createdAt: usersTable.createdAt,
+    }).from(usersTable);
+
+    const userMap = new Map<string, any>();
+
+    signedUpUsers.forEach((u) => {
+      let isoDate: string;
+      try {
+        const d = u.createdAt instanceof Date ? u.createdAt : new Date(u.createdAt);
+        isoDate = !isNaN(d.getTime()) ? d.toISOString() : new Date().toISOString();
+      } catch {
+        isoDate = new Date().toISOString();
+      }
+      const cleanEmail = u.email.toLowerCase().trim();
+      userMap.set(cleanEmail, {
+        ...u,
+        createdAt: isoDate,
+        isSignedUp: true,
+      });
+    });
+
+    // 2. Get event registration guests and include any not yet in userMap
+    const requests = await db.select().from(attendanceRequestsTable);
+
+    requests.forEach((r) => {
+      const cleanEmail = r.email.toLowerCase().trim();
+      if (!userMap.has(cleanEmail)) {
+        let isoDate: string;
+        try {
+          const d = r.createdAt instanceof Date ? r.createdAt : new Date(r.createdAt);
+          isoDate = !isNaN(d.getTime()) ? d.toISOString() : new Date().toISOString();
+        } catch {
+          isoDate = new Date().toISOString();
+        }
+        userMap.set(cleanEmail, {
+          id: r.id, // request id fallback
+          name: r.name,
+          email: r.email,
+          phone: r.phone,
+          department: r.department || "PGIMER",
+          createdAt: isoDate,
+          isSignedUp: false,
+          status: r.status,
+        });
+      }
+    });
+
+    const combinedList = Array.from(userMap.values());
+    return res.json(combinedList);
+  } catch (err) {
+    req.log.error({ err }, "Failed to list registered users");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// DELETE /admin/users/:id - Remove a user account
+router.delete("/admin/users/:id", async (req, res) => {
+  if (!(req.session as any)?.admin) return res.status(401).json({ error: "Unauthorized" });
+  const id = Number(req.params.id);
+  if (!id) return res.status(400).json({ error: "Invalid user ID" });
+
+  try {
+    const { usersTable, attendanceRequestsTable } = await import("@workspace/db");
+
+    // Unlink attendance requests first
+    await db.update(attendanceRequestsTable).set({ userId: null }).where(eq(attendanceRequestsTable.userId, id));
+
+    // Delete user
+    await db.delete(usersTable).where(eq(usersTable.id, id));
+
+    return res.json({ message: "User deleted" });
+  } catch (err) {
+    req.log.error({ err }, "Failed to delete user");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;

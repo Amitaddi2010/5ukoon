@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-
 
 const navLinks = [
   { href: "/", label: "Home" },
+  { href: "/my-passes", label: "My Passes 🎟️" },
   { href: "/#experience", label: "The Experience" },
   { href: "/#arc", label: "The Arc" },
   { href: "/#edition", label: "Edition I" },
@@ -16,7 +17,7 @@ const socialLinks = [
   { label: "Email", href: "mailto:hello@sukoon.com" },
 ];
 
-export function Navbar() {
+export function Navbar({ onOpenRegisterModal }: { onOpenRegisterModal?: () => void }) {
   const [panelOpen, setPanelOpen] = useState(false);
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
@@ -64,13 +65,22 @@ export function Navbar() {
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-3">
-          <Link
-            href="/request"
-            className="hidden sm:inline-flex items-center px-5 h-8 text-[12px] tracking-[0.12em] uppercase border border-white/80 rounded-full text-white hover:bg-white hover:text-black transition-all duration-200 font-medium"
-          >
-            Let&apos;s Talk
-          </Link>
+        <div className="flex items-center gap-2 sm:gap-3">
+          {onOpenRegisterModal ? (
+            <button
+              onClick={onOpenRegisterModal}
+              className="inline-flex items-center px-3.5 sm:px-5 h-7.5 sm:h-8 text-[10px] sm:text-[12px] tracking-[0.1em] uppercase border border-amber-400/80 rounded-full text-amber-300 hover:bg-amber-400 hover:text-black transition-all duration-200 font-semibold shadow-sm"
+            >
+              Register
+            </button>
+          ) : (
+            <Link
+              href="/request"
+              className="inline-flex items-center px-3 sm:px-5 h-7.5 sm:h-8 text-[10px] sm:text-[12px] tracking-[0.1em] uppercase border border-white/80 rounded-full text-white hover:bg-white hover:text-black transition-all duration-200 font-medium"
+            >
+              Talk
+            </Link>
+          )}
           {/* Dot trigger — opens panel */}
           <button
             onClick={() => setPanelOpen((v) => !v)}
@@ -204,12 +214,23 @@ export function Navbar() {
                   </div>
 
                   {/* Edition info */}
-                  <div className="border-t border-white/[0.06] pt-6">
-                    <p className="text-[10px] tracking-[0.2em] text-white/20 uppercase mb-2 font-medium">
+                  <div className="border-t border-white/[0.06] pt-6 space-y-1">
+                    <p className="text-[10px] tracking-[0.2em] text-white/20 uppercase font-medium">
                       Next Edition
                     </p>
-                    <p className="text-[14px] text-white/55 font-light">
+                    <p className="text-[14px] text-white/70 font-light">
                       Sukoon: Edition I — Chandigarh
+                    </p>
+                    <p className="text-[12px] text-white/40 pt-2 font-light">
+                      Developed & managed by{" "}
+                      <a
+                        href="https://amitrajsaraswat.space/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-amber-300 hover:underline font-medium"
+                      >
+                        Amit Raj Saraswat
+                      </a>
                     </p>
                   </div>
 

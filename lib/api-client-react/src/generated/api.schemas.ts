@@ -78,6 +78,10 @@ export interface AttendanceRequest {
   mutualConnection?: string | null;
   /** @nullable */
   whyAttend?: string | null;
+  /** @nullable */
+  department?: string | null;
+  /** @nullable */
+  attendancePossibility?: string | null;
   status: AttendanceRequestStatus;
   /** @nullable */
   ticketCode?: string | null;
@@ -96,6 +100,8 @@ export interface AttendanceRequestInput {
   heardAbout?: string;
   mutualConnection?: string;
   whyAttend?: string;
+  department?: string;
+  attendancePossibility?: string;
 }
 
 export type RequestStatusUpdateStatus = typeof RequestStatusUpdateStatus[keyof typeof RequestStatusUpdateStatus];
@@ -141,6 +147,59 @@ export interface AdminLoginInput {
 export interface AdminSession {
   username: string;
   name: string;
+}
+
+export interface UserSignUpInput {
+  /** @minLength 2 */
+  name: string;
+  department: string;
+  /** @minLength 10 */
+  phone: string;
+  email: string;
+  /** @minLength 4 */
+  password: string;
+}
+
+export interface UserLoginInput {
+  email: string;
+  password: string;
+}
+
+export interface UserProfile {
+  id: number;
+  name: string;
+  department: string;
+  phone: string;
+  email: string;
+}
+
+export type UserPassStatus = typeof UserPassStatus[keyof typeof UserPassStatus];
+
+
+export const UserPassStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  declined: 'declined',
+  waitlisted: 'waitlisted',
+} as const;
+
+export interface UserPass {
+  id: number;
+  eventId: number;
+  eventTitle: string;
+  eventDate: string;
+  /** @nullable */
+  eventVenue: string | null;
+  status: UserPassStatus;
+  /** @nullable */
+  ticketCode?: string | null;
+  name: string;
+  /** @nullable */
+  department: string | null;
+  /** @nullable */
+  attendancePossibility?: string | null;
+  checkedIn?: boolean;
+  createdAt: string;
 }
 
 export type ListRequestsParams = {

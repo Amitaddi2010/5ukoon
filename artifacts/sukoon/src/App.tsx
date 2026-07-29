@@ -9,6 +9,7 @@ import { AdminLogin } from '@/pages/admin/Login';
 import { AdminRequests } from '@/pages/admin/Requests';
 import { AdminCheckin } from '@/pages/admin/Checkin';
 import { AdminEvents } from '@/pages/admin/Events';
+import { MyPasses } from '@/pages/MyPasses';
 import { CustomCursor } from '@/components/CustomCursor';
 import { SmoothScroll } from '@/components/SmoothScroll';
 import { useState, useEffect } from 'react';
@@ -50,6 +51,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/my-passes" component={MyPasses} />
       <Route path="/request" component={RequestForm} />
       <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/requests" component={AdminRequests} />

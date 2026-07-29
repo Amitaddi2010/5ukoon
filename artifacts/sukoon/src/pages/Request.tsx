@@ -15,10 +15,12 @@ const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
   phone: z.string().min(10, "Valid phone number required"),
   email: z.string().email("Valid email required"),
+  department: z.string().min(1, "Department is required"),
+  attendancePossibility: z.string().min(1, "Possibility of attending is required"),
   socialHandle: z.string().optional(),
   heardAbout: z.string().optional(),
   mutualConnection: z.string().optional(),
-  whyAttend: z.string().min(10, "Please share a bit more about your intention").max(300),
+  whyAttend: z.string().optional(),
   eventId: z.number()
 });
 
@@ -42,8 +44,9 @@ export function RequestForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "", phone: "", email: "", socialHandle: "",
-      heardAbout: "", mutualConnection: "", whyAttend: "",
+      name: "", phone: "", email: "", department: "Anaesthesia",
+      attendancePossibility: "Definitely (100%)", socialHandle: "",
+      heardAbout: "", mutualConnection: "", whyAttend: "PGIMER Registration",
       eventId: activeEvent?.id || 1,
     },
   });

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { attendanceRequestsTable, guestsTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq, and, or } from "drizzle-orm";
 import { randomBytes } from "crypto";
 
 const router = Router();
@@ -36,24 +36,63 @@ router.get("/requests", async (req, res) => {
 
 // POST /requests — public submission
 router.post("/requests", async (req, res) => {
-  const { eventId, name, phone, email, socialHandle, heardAbout, mutualConnection, whyAttend } = req.body;
+  const { eventId, name, phone, email, socialHandle, heardAbout, mutualConnection, whyAttend, department, attendancePossibility } = req.body;
 
   if (!eventId || !name || !phone || !email) {
     return res.status(400).json({ error: "eventId, name, phone, and email are required" });
   }
 
+  const sessionUser = (req.session as any)?.user;
+  const cleanEmail = email.toLowerCase().trim();
+  const cleanPhone = phone.trim();
+
   try {
+    const existing = await db
+      .select()
+      .from(attendanceRequestsTable)
+      .where(
+        and(
+          eq(attendanceRequestsTable.eventId, Number(eventId)),
+          or(
+            eq(attendanceRequestsTable.email, cleanEmail),
+            eq(attendanceRequestsTable.phone, cleanPhone)
+          )
+        )
+      );
+
+    if (existing.length > 0) {
+      const [updated] = await db
+        .update(attendanceRequestsTable)
+        .set({
+          name: name.trim(),
+          phone: phone.trim(),
+          department: department || existing[0].department,
+          attendancePossibility: attendancePossibility || existing[0].attendancePossibility,
+          userId: sessionUser?.id || existing[0].userId,
+        })
+        .where(eq(attendanceRequestsTable.id, existing[0].id))
+        .returning();
+
+      return res.json({
+        ...serializeRequest(updated),
+        isDuplicate: true,
+      });
+    }
+
     const [request] = await db
       .insert(attendanceRequestsTable)
       .values({
         eventId: Number(eventId),
-        name,
-        phone,
-        email,
+        userId: sessionUser?.id || null,
+        name: name.trim(),
+        phone: phone.trim(),
+        email: cleanEmail,
         socialHandle: socialHandle || null,
         heardAbout: heardAbout || null,
         mutualConnection: mutualConnection || null,
         whyAttend: whyAttend || null,
+        department: department || null,
+        attendancePossibility: attendancePossibility || null,
         status: "pending",
       })
       .returning();

@@ -2,10 +2,12 @@ import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { eventsTable } from "./events";
+import { usersTable } from "./users";
 
 export const attendanceRequestsTable = sqliteTable("attendance_requests", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   eventId: integer("event_id").notNull().references(() => eventsTable.id),
+  userId: integer("user_id").references(() => usersTable.id),
   name: text("name").notNull(),
   phone: text("phone").notNull(),
   email: text("email").notNull(),
@@ -13,6 +15,8 @@ export const attendanceRequestsTable = sqliteTable("attendance_requests", {
   heardAbout: text("heard_about"),
   mutualConnection: text("mutual_connection"),
   whyAttend: text("why_attend"),
+  department: text("department"),
+  attendancePossibility: text("attendance_possibility"),
   status: text("status", { enum: ["pending", "approved", "declined", "waitlisted"] }).notNull().default("pending"),
   ticketCode: text("ticket_code"),
   checkedIn: integer("checked_in", { mode: "boolean" }).notNull().default(false),

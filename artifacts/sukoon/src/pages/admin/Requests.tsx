@@ -1,17 +1,22 @@
 import { useState, useMemo } from "react";
-import { useListRequests, useUpdateRequestStatus, useGetEventStats, useListEvents, useAdminLogout, getListRequestsQueryKey, getGetEventStatsQueryKey } from "@workspace/api-client-react";
+import { useListRequests, useUpdateRequestStatus, useGetEventStats, useListEvents, useAdminLogout, useListUsers, useDeleteUser, getListRequestsQueryKey, getGetEventStatsQueryKey, getListUsersQueryKey } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, BarChart2, List, Building2, Calendar, Users, Trash2, Mail, Phone, UserCheck } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useAdminGuard } from "@/hooks/use-admin-guard";
+import { AnalyticsCharts } from "@/components/admin/AnalyticsCharts";
+import { useToast } from "@/hooks/use-toast";
 
 export function AdminRequests() {
   const { isAuthenticated, isLoading: checkingAuth } = useAdminGuard();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [filter, setFilter] = useState<string>("all");
+  const [userSearch, setUserSearch] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<"requests" | "analytics" | "users">("requests");
 
   const { data: events } = useListEvents();
   const eventId = events?.[0]?.id;
@@ -26,7 +31,26 @@ export function AdminRequests() {
     { query: { enabled: !!eventId, queryKey: getGetEventStatsQueryKey(eventId!) } }
   );
 
-  const updateStatus = useUpdateRequestStatus();
+  const { data: users, isLoading: loadingUsers, refetch: refetchUsers } = useListUsers({
+    query: {
+      queryKey: getListUsersQueryKey(),
+      staleTime: 0,
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
+    }
+  });
+
+  const deleteUserMutation = useDeleteUser();
+
+  const handleDeleteUser = (userId: number, userName: string) => {
+    if (!window.confirm(`Are you sure you want to delete account for ${userName}?`)) return;
+    deleteUserMutation.mutate({ id: userId }, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListUsersQueryKey() });
+        toast({ title: "User Deleted", description: `Account for ${userName} has been removed.` });
+      }
+    });
+  };
   const logout = useAdminLogout();
 
   const handleLogout = () => {
@@ -55,6 +79,23 @@ export function AdminRequests() {
     if (filter === "all") return requests;
     return requests.filter(r => r.status === filter);
   }, [requests, filter]);
+
+  const filteredUsers = useMemo(() => {
+    const list = Array.isArray(users)
+      ? users
+      : Array.isArray((users as any)?.data)
+        ? (users as any).data
+        : [];
+
+    if (!userSearch.trim()) return list;
+    const term = userSearch.toLowerCase();
+    return list.filter((u: any) =>
+      (u.name || "").toLowerCase().includes(term) ||
+      (u.email || "").toLowerCase().includes(term) ||
+      (u.phone || "").includes(term) ||
+      (u.department || "").toLowerCase().includes(term)
+    );
+  }, [users, userSearch]);
 
   const statusLabel = (status: string) => {
     const map: Record<string, string> = {
@@ -93,7 +134,7 @@ export function AdminRequests() {
               SUKOON©
             </Link>
             <span className="text-white/15">|</span>
-            <span className="text-[11px] tracking-[0.15em] text-white/30 uppercase font-medium">Admin</span>
+            <span className="text-[11px] tracking-[0.15em] text-white/30 uppercase font-medium">Admin Control</span>
           </div>
           <div className="flex items-center gap-6">
             <Link
@@ -118,131 +159,302 @@ export function AdminRequests() {
         </div>
       </header>
 
-      <main className="px-6 md:px-10 py-16 max-w-7xl mx-auto space-y-16">
+      <main className="px-4 sm:px-6 md:px-10 py-8 sm:py-12 max-w-7xl mx-auto space-y-8 sm:space-y-12">
+        {/* Navigation Tabs */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 pb-4 gap-4">
+          <div>
+            <span className="text-[10px] sm:text-[11px] tracking-[0.2em] text-amber-400 uppercase font-medium block mb-1">
+              Event Control Center
+            </span>
+            <h1 className="text-xl sm:text-3xl font-serif text-white">
+              PGIMER Sat. 1st August 2026 Rooftop Session
+            </h1>
+          </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border border-white/[0.1]">
+          <div className="flex items-center gap-1.5 bg-zinc-950 p-1 sm:p-1.5 rounded-full border border-white/10 w-full sm:w-auto justify-center">
+            <button
+              onClick={() => setActiveTab("requests")}
+              className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[10px] sm:text-[12px] tracking-wide uppercase font-medium transition-all ${
+                activeTab === "requests"
+                  ? "bg-white text-black font-semibold shadow-md"
+                  : "text-white/50 hover:text-white"
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              <span>Requests ({requests?.length ?? 0})</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("analytics")}
+              className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[10px] sm:text-[12px] tracking-wide uppercase font-medium transition-all ${
+                activeTab === "analytics"
+                  ? "bg-amber-400 text-black font-semibold shadow-md"
+                  : "text-white/50 hover:text-white"
+              }`}
+            >
+              <BarChart2 className="w-3.5 h-3.5" />
+              <span>Analytics</span>
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab("users");
+                refetchUsers();
+              }}
+              className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[10px] sm:text-[12px] tracking-wide uppercase font-medium transition-all ${
+                activeTab === "users"
+                  ? "bg-emerald-400 text-black font-semibold shadow-md"
+                  : "text-white/50 hover:text-white"
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Accounts ({filteredUsers.length})</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Stats Summary Bar */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border border-white/[0.1] rounded-xl overflow-hidden bg-zinc-950/40">
           {[
-            { label: "CAPACITY", value: stats?.capacity ?? 25, color: "text-white" },
+            { label: "CAPACITY", value: stats?.capacity ?? 50, color: "text-white" },
             { label: "CONFIRMED", value: stats?.confirmed ?? 0, color: "text-emerald-400" },
             { label: "PENDING", value: stats?.pending ?? 0, color: "text-white" },
             { label: "WAITLISTED", value: stats?.waitlisted ?? 0, color: "text-amber-400" },
           ].map((item, i) => (
-            <div key={item.label} className={`p-7 md:p-9 ${i < 3 ? "border-r border-white/[0.1]" : ""}`}>
-              <p className="text-[10px] tracking-[0.2em] text-white/25 uppercase mb-3 font-medium">{item.label}</p>
-              <p className={`text-4xl font-medium ${item.color}`}>{item.value}</p>
+            <div key={item.label} className={`p-6 ${i < 3 ? "border-r border-white/[0.1]" : ""}`}>
+              <p className="text-[10px] tracking-[0.2em] text-white/30 uppercase mb-2 font-medium">{item.label}</p>
+              <p className={`text-3xl font-medium ${item.color}`}>{item.value}</p>
             </div>
           ))}
         </div>
 
-        {/* Requests table */}
-        <div>
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-medium text-white tracking-tight">
-                Requests ({filteredRequests.length})
-              </h2>
-            </div>
-            <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-[160px] h-9 bg-transparent border border-white/20 rounded-full text-[12px] tracking-[0.1em] uppercase text-white/60 font-medium focus:ring-0">
-                <SelectValue placeholder="All" />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-950 border-white/10 text-white">
-                <SelectItem value="all" className="text-[12px] tracking-wide uppercase">All</SelectItem>
-                <SelectItem value="pending" className="text-[12px] tracking-wide uppercase">Pending</SelectItem>
-                <SelectItem value="approved" className="text-[12px] tracking-wide uppercase">Approved</SelectItem>
-                <SelectItem value="waitlisted" className="text-[12px] tracking-wide uppercase">Waitlisted</SelectItem>
-                <SelectItem value="declined" className="text-[12px] tracking-wide uppercase">Declined</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Tab 1: Demographics & Analytics View */}
+        {activeTab === "analytics" && (
+          <AnalyticsCharts requests={requests || []} />
+        )}
 
-          {loadingReqs ? (
-            <div className="py-24 flex justify-center">
-              <Loader2 className="w-5 h-5 animate-spin text-white/25" />
+        {/* Tab 2: Requests Table View */}
+        {activeTab === "requests" && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-medium text-white tracking-tight">
+                Guest Registrations ({filteredRequests.length})
+              </h2>
+              <Select value={filter} onValueChange={setFilter}>
+                <SelectTrigger className="w-[160px] h-9 bg-transparent border border-white/20 rounded-full text-[12px] tracking-[0.1em] uppercase text-white/60 font-medium focus:ring-0">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-950 border-white/10 text-white">
+                  <SelectItem value="all" className="text-[12px] tracking-wide uppercase">All</SelectItem>
+                  <SelectItem value="pending" className="text-[12px] tracking-wide uppercase">Pending</SelectItem>
+                  <SelectItem value="approved" className="text-[12px] tracking-wide uppercase">Approved</SelectItem>
+                  <SelectItem value="waitlisted" className="text-[12px] tracking-wide uppercase">Waitlisted</SelectItem>
+                  <SelectItem value="declined" className="text-[12px] tracking-wide uppercase">Declined</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          ) : filteredRequests.length === 0 ? (
-            <div className="border-t border-white/[0.08] py-20 text-center">
-              <p className="text-[13px] text-white/25 tracking-wide font-light">No requests found.</p>
-            </div>
-          ) : (
-            <div>
-              {/* Column headers */}
-              <div className="border-t border-white/[0.08] grid grid-cols-[2fr_2fr_3fr_1fr_auto] gap-6 py-3 px-2">
-                {["GUEST", "CONTACT", "INTENTION", "STATUS", ""].map(h => (
-                  <span key={h} className="text-[10px] tracking-[0.2em] text-white/20 uppercase font-medium">{h}</span>
+
+            {loadingReqs ? (
+              <div className="py-24 flex justify-center">
+                <Loader2 className="w-5 h-5 animate-spin text-white/25" />
+              </div>
+            ) : filteredRequests.length === 0 ? (
+              <div className="border border-white/[0.08] rounded-xl py-20 text-center">
+                <p className="text-[13px] text-white/25 tracking-wide font-light">No registrations found.</p>
+              </div>
+            ) : (
+              <div className="border border-white/[0.08] rounded-xl overflow-x-auto">
+                <div className="min-w-[760px]">
+                  {/* Column headers */}
+                  <div className="bg-white/[0.03] border-b border-white/[0.08] grid grid-cols-[2fr_2fr_2fr_2fr_1fr_auto] gap-4 py-3 px-4">
+                  {["GUEST & DEPT", "CONTACT", "ATTENDANCE LIKELIHOOD", "REGISTERED AT", "STATUS", "ACTIONS"].map(h => (
+                    <span key={h} className="text-[10px] tracking-[0.18em] text-white/30 uppercase font-medium">{h}</span>
+                  ))}
+                </div>
+
+                {filteredRequests.map((req, i) => (
+                  <div
+                    key={req.id}
+                    className={`border-t border-white/[0.08] first:border-t-0 grid grid-cols-[2fr_2fr_2fr_2fr_1fr_auto] gap-4 py-5 px-4 items-center group hover:bg-white/[0.02] transition-colors`}
+                  >
+                    {/* Guest & Dept */}
+                    <div>
+                      <p className="text-[14px] font-medium text-white leading-snug">{req.name}</p>
+                      <span className="inline-block mt-1 text-[11px] text-amber-300/90 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded font-medium">
+                        {req.department || "General PGIMER"}
+                      </span>
+                    </div>
+
+                    {/* Contact */}
+                    <div>
+                      <p className="text-[13px] text-white/70 font-light leading-snug">{req.email}</p>
+                      <p className="text-[12px] text-white/40 font-light mt-0.5">{req.phone}</p>
+                    </div>
+
+                    {/* Attendance Likelihood */}
+                    <div>
+                      <span className="text-[12px] text-white/80 bg-white/5 border border-white/10 px-2.5 py-1 rounded-md font-medium">
+                        {req.attendancePossibility || "Definitely (100%)"}
+                      </span>
+                    </div>
+
+                    {/* Registered At */}
+                    <div>
+                      <p className="text-[12px] text-white/40 font-light">
+                        {format(new Date(req.createdAt), "MMM d, h:mm a")}
+                      </p>
+                    </div>
+
+                    {/* Status */}
+                    <div>
+                      <span className={`text-[11px] tracking-[0.15em] font-semibold ${statusColor(req.status)}`}>
+                        {statusLabel(req.status)}
+                      </span>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      {req.status === 'pending' && (
+                        <>
+                          <ActionBtn onClick={() => handleStatusUpdate(req.id, 'approved')} label="✓" color="text-emerald-400 hover:bg-emerald-400/10 border-emerald-400/20" title="Approve & Generate Pass" />
+                          <ActionBtn onClick={() => handleStatusUpdate(req.id, 'waitlisted')} label="~" color="text-amber-400 hover:bg-amber-400/10 border-amber-400/20" title="Waitlist" />
+                          <ActionBtn onClick={() => handleStatusUpdate(req.id, 'declined')} label="✕" color="text-red-400 hover:bg-red-400/10 border-red-400/20" title="Decline" />
+                        </>
+                      )}
+                      {req.status === 'approved' && (
+                        <div className="flex items-center gap-1.5">
+                          {/* Send WhatsApp Pass */}
+                          <a
+                            href={`https://wa.me/${req.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                              `*SUKOON ROOFTOP MEHFIL — ENTRY PASS* 🌙\n\nDear ${req.name} (${req.department || 'PGIMER'}),\n\nYour registration for Sukoon Rooftop Session has been CONFIRMED! 🎉\n\n📅 *When:* This Saturday at 6:00 PM\n📍 *Venue:* ODH Mess Rooftop, PGIMER Chandigarh\n🎟️ *Ticket Code:* ${req.ticketCode || 'SKN-PASS'}\n\n⚠️ *Entry Rules:* Strictly PGIMER Residents & Staff only. Please present your PGIMER ID / Ticket Code at entry.\n\nSee you at the rooftop!\n- Sukoon Team`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-2.5 py-1 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[11px] font-medium hover:bg-emerald-500/25 transition-colors flex items-center gap-1"
+                            title="Send Pass via WhatsApp"
+                          >
+                            <span>WhatsApp Pass</span>
+                          </a>
+
+                          {/* Send Email Pass */}
+                          <a
+                            href={`mailto:${req.email}?subject=${encodeURIComponent('Sukoon Rooftop Mehfil - Entry Pass Confirmation')}&body=${encodeURIComponent(
+                              `Dear ${req.name} (${req.department || 'PGIMER'}),\n\nYour registration for Sukoon Rooftop Session has been CONFIRMED!\n\nEvent Details:\n📅 Date & Time: This Saturday at 6:00 PM\n📍 Venue: ODH Mess Rooftop, PGIMER Chandigarh\n🎟️ Ticket Code: ${req.ticketCode || 'SKN-PASS'}\n\nEntry Rules: Strictly PGIMER Residents & Staff only. Please present your PGIMER ID card / Ticket Code at entry.\n\nWarm regards,\nSukoon Team`
+                            )}`}
+                            className="px-2.5 py-1 rounded-md bg-blue-500/15 border border-blue-500/30 text-blue-400 text-[11px] font-medium hover:bg-blue-500/25 transition-colors flex items-center gap-1"
+                            title="Send Pass via Email"
+                          >
+                            <span>Email Pass</span>
+                          </a>
+
+                          <button
+                            onClick={() => handleStatusUpdate(req.id, 'pending')}
+                            className="text-[11px] uppercase text-white/30 hover:text-white transition-colors ml-1 font-medium"
+                            title="Reset to Pending"
+                          >
+                            Reset
+                          </button>
+                        </div>
+                      )}
+                      {req.status !== 'pending' && req.status !== 'approved' && (
+                        <button
+                          onClick={() => handleStatusUpdate(req.id, 'pending')}
+                          className="text-[11px] tracking-[0.1em] uppercase text-white/30 hover:text-white transition-colors font-medium"
+                        >
+                          Reset
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 ))}
               </div>
-
-              {filteredRequests.map((req, i) => (
-                <div
-                  key={req.id}
-                  className={`border-t border-white/[0.08] grid grid-cols-[2fr_2fr_3fr_1fr_auto] gap-6 py-6 px-2 items-start group ${i === filteredRequests.length - 1 ? 'border-b' : ''}`}
-                >
-                  {/* Guest */}
-                  <div>
-                    <p className="text-[14px] font-medium text-white leading-snug">{req.name}</p>
-                    {req.mutualConnection && (
-                      <p className="text-[12px] text-white/30 font-light mt-1">Knows: {req.mutualConnection}</p>
-                    )}
-                    {req.socialHandle && (
-                      <a
-                        href={req.socialHandle.includes('http') ? req.socialHandle : `https://${req.socialHandle}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[12px] text-white/25 hover:text-white transition-colors font-light mt-1 block truncate"
-                      >
-                        {req.socialHandle}
-                      </a>
-                    )}
-                  </div>
-
-                  {/* Contact */}
-                  <div>
-                    <p className="text-[13px] text-white/60 font-light leading-snug">{req.email}</p>
-                    <p className="text-[12px] text-white/30 font-light mt-1">{req.phone}</p>
-                  </div>
-
-                  {/* Intention */}
-                  <div>
-                    <p className="text-[13px] text-white/50 font-light leading-relaxed line-clamp-2 italic">
-                      &ldquo;{req.whyAttend}&rdquo;
-                    </p>
-                    <p className="text-[11px] text-white/20 font-light mt-2 tracking-wide">
-                      {req.heardAbout || "—"} · {format(new Date(req.createdAt), "MMM d")}
-                    </p>
-                  </div>
-
-                  {/* Status */}
-                  <div>
-                    <span className={`text-[11px] tracking-[0.15em] font-medium ${statusColor(req.status)}`}>
-                      {statusLabel(req.status)}
-                    </span>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-1">
-                    {req.status === 'pending' && (
-                      <>
-                        <ActionBtn onClick={() => handleStatusUpdate(req.id, 'approved')} label="✓" color="text-emerald-400 hover:bg-emerald-400/10 border-emerald-400/20" title="Approve" />
-                        <ActionBtn onClick={() => handleStatusUpdate(req.id, 'waitlisted')} label="~" color="text-amber-400 hover:bg-amber-400/10 border-amber-400/20" title="Waitlist" />
-                        <ActionBtn onClick={() => handleStatusUpdate(req.id, 'declined')} label="✕" color="text-red-400 hover:bg-red-400/10 border-red-400/20" title="Decline" />
-                      </>
-                    )}
-                    {req.status !== 'pending' && (
-                      <button
-                        onClick={() => handleStatusUpdate(req.id, 'pending')}
-                        className="text-[11px] tracking-[0.1em] uppercase text-white/20 hover:text-white/50 transition-colors font-medium"
-                      >
-                        Reset
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
             </div>
           )}
         </div>
+      )}
+
+        {/* Tab 3: Registered User Accounts Management View */}
+        {activeTab === "users" && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-medium text-white tracking-tight">
+                  Registered User Accounts ({filteredUsers.length})
+                </h2>
+                <p className="text-[12px] text-white/50 font-light">
+                  Manage accounts created by guests via the signup portal.
+                </p>
+              </div>
+
+              <input
+                type="text"
+                placeholder="Search user by name, email, phone, or department..."
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
+                className="w-full sm:w-80 h-10 px-4 rounded-full bg-zinc-950 border border-white/20 text-white placeholder:text-white/30 text-xs focus:outline-none focus:border-emerald-400 transition-colors"
+              />
+            </div>
+
+            {loadingUsers ? (
+              <div className="py-20 flex justify-center">
+                <Loader2 className="w-5 h-5 animate-spin text-white/25" />
+              </div>
+            ) : filteredUsers.length === 0 ? (
+              <div className="py-20 text-center border border-white/10 rounded-2xl bg-zinc-950/40">
+                <Users className="w-10 h-10 text-white/20 mx-auto mb-2" />
+                <p className="text-[13px] text-white/40 font-light">No registered user accounts found.</p>
+              </div>
+            ) : (
+              <div className="border border-white/[0.08] rounded-xl overflow-hidden bg-zinc-950/40">
+                <div className="divide-y divide-white/[0.06]">
+                  {filteredUsers.map((u: any) => (
+                    <div
+                      key={u.id}
+                      className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-3">
+                          <h3 className="text-base font-medium text-white">{u.name}</h3>
+                          <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-300">
+                            {u.department}
+                          </span>
+                          {u.isSignedUp ? (
+                            <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
+                              Account User
+                            </span>
+                          ) : (
+                            <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-400">
+                              Registered Guest
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-4 text-[12px] text-white/60">
+                          <span className="flex items-center gap-1">
+                            <Mail className="w-3.5 h-3.5 text-white/40" />
+                            {u.email}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Phone className="w-3.5 h-3.5 text-white/40" />
+                            {u.phone}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 shrink-0">
+                        <button
+                          onClick={() => handleDeleteUser(u.id, u.name)}
+                          className="px-3.5 py-1.5 rounded-full border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-[11px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+                          title="Delete User Account"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete Account</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </main>
     </div>
   );

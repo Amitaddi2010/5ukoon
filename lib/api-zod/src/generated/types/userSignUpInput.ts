@@ -6,17 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface AttendanceRequestInput {
-  eventId: number;
+export interface UserSignUpInput {
   /** @minLength 2 */
   name: string;
+  department: string;
   /** @minLength 10 */
   phone: string;
   email: string;
-  socialHandle?: string;
-  heardAbout?: string;
-  mutualConnection?: string;
-  whyAttend?: string;
-  department?: string;
-  attendancePossibility?: string;
+  /** @minLength 4 */
+  password: string;
 }

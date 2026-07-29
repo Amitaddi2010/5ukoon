@@ -21,6 +21,10 @@ export interface AttendanceRequest {
   mutualConnection?: string | null;
   /** @nullable */
   whyAttend?: string | null;
+  /** @nullable */
+  department?: string | null;
+  /** @nullable */
+  attendancePossibility?: string | null;
   status: AttendanceRequestStatus;
   /** @nullable */
   ticketCode?: string | null;

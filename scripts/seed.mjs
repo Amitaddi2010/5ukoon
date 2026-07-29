@@ -26,6 +26,18 @@ const eventsTable = sqliteTable("events", {
   createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 });
 
+const attendanceRequestsTable = sqliteTable("attendance_requests", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  eventId: integer("event_id").notNull(),
+  name: text("name").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email").notNull(),
+  department: text("department"),
+  attendancePossibility: text("attendance_possibility"),
+  status: text("status").notNull().default("pending"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+});
+
 function hashPassword(password) {
   return createHash("sha256").update(password + "sukoon-salt-2026").digest("hex");
 }
@@ -50,31 +62,67 @@ async function main() {
     if (err.message?.includes("UNIQUE constraint")) {
       console.log(`ℹ️  Admin user "${username}" already exists, skipping.`);
     } else {
-      throw err;
+      console.log("Admin table notice:", err.message);
     }
   }
 
-  // Seed a sample event
-  try {
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 30);
+  // Next Saturday 6:00 PM calculation
+  const now = new Date();
+  const daysUntilSat = (6 - now.getDay() + 7) % 7 || 7;
+  const satDate = new Date(now);
+  satDate.setDate(now.getDate() + daysUntilSat);
+  satDate.setHours(18, 0, 0, 0);
 
-    await db.insert(eventsTable).values({
-      title: "Sukoon – Edition 1",
-      editionNumber: 1,
-      date: futureDate,
-      city: "Mumbai",
-      venue: "TBD",
-      capacity: 25,
-      price: "500",
-      status: "upcoming",
-    });
-    console.log("✅ Sample event created: Sukoon – Edition 1");
+  // Seed or update PGIMER Saturday Event
+  try {
+    const existingEvents = await db.select().from(eventsTable);
+    if (existingEvents.length === 0) {
+      await db.insert(eventsTable).values({
+        title: "Sukoon Mehfil – Rooftop Session",
+        editionNumber: 1,
+        date: satDate,
+        city: "Chandigarh",
+        venue: "ODH Mess Rooftop, PGIMER Chandigarh",
+        capacity: 50,
+        price: "0",
+        offerText: "PGIMER Residents & Staff Only — Outsiders strictly NOT allowed",
+        status: "upcoming",
+      });
+      console.log("✅ PGIMER Rooftop Saturday Event created!");
+    }
   } catch (err) {
-    console.log("ℹ️  Event may already exist or error:", err.message);
+    console.log("ℹ️  Event seed notice:", err.message);
   }
 
-  console.log("\n🎉 Seed complete! You can now log in at /admin with:");
+  // Seed sample requests for analytics charts demo
+  try {
+    const existingReqs = await db.select().from(attendanceRequestsTable);
+    if (existingReqs.length < 5) {
+      const sampleData = [
+        { name: "Dr. Aakash Sharma", phone: "9876543210", email: "aakash.s@pgimer.edu.in", department: "Anaesthesia", attendancePossibility: "Definitely (100%)", status: "approved" },
+        { name: "Dr. Priya Verma", phone: "9876543211", email: "priya.v@pgimer.edu.in", department: "Internal Medicine", attendancePossibility: "Definitely (100%)", status: "approved" },
+        { name: "Rahul Gupta", phone: "9876543212", email: "rahul.g@pgimer.edu.in", department: "Nursing", attendancePossibility: "Likely (75%)", status: "pending" },
+        { name: "Dr. Rohan Malhotra", phone: "9876543213", email: "rohan.m@pgimer.edu.in", department: "Cardiology", attendancePossibility: "Definitely (100%)", status: "approved" },
+        { name: "Simran Kaur", phone: "9876543214", email: "simran.k@pgimer.edu.in", department: "Pediatrics", attendancePossibility: "50-50 / Unsure", status: "pending" },
+        { name: "Dr. Vikram Singh", phone: "9876543215", email: "vikram.s@pgimer.edu.in", department: "Surgery", attendancePossibility: "Definitely (100%)", status: "pending" },
+        { name: "Neha Thakur", phone: "9876543216", email: "neha.t@pgimer.edu.in", department: "Orthopedics", attendancePossibility: "Likely (75%)", status: "waitlisted" },
+        { name: "Dr. Ananya Ray", phone: "9876543217", email: "ananya.r@pgimer.edu.in", department: "Anaesthesia", attendancePossibility: "Definitely (100%)", status: "pending" },
+      ];
+
+      for (const req of sampleData) {
+        await db.insert(attendanceRequestsTable).values({
+          eventId: 1,
+          ...req,
+          createdAt: new Date(),
+        });
+      }
+      console.log("✅ Sample PGIMER registrations seeded for analytics demo.");
+    }
+  } catch (err) {
+    console.log("ℹ️  Sample requests notice:", err.message);
+  }
+
+  console.log("\n🎉 Seed complete! Admin login at /admin:");
   console.log(`   Username: ${username}`);
   console.log(`   Password: ${password}`);
 }

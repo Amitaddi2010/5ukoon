@@ -9,6 +9,89 @@ import * as zod from 'zod';
 
 
 /**
+ * @summary Guest sign up
+ */
+export const userSignUpBodyNameMin = 2;
+
+export const userSignUpBodyPhoneMin = 10;
+
+export const userSignUpBodyPasswordMin = 4;
+
+
+
+export const UserSignUpBody = zod.object({
+  "name": zod.string().min(userSignUpBodyNameMin),
+  "department": zod.string(),
+  "phone": zod.string().min(userSignUpBodyPhoneMin),
+  "email": zod.string(),
+  "password": zod.string().min(userSignUpBodyPasswordMin)
+})
+
+export const UserSignUpResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "department": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string()
+})
+
+
+/**
+ * @summary Guest login
+ */
+export const UserLoginBody = zod.object({
+  "email": zod.string(),
+  "password": zod.string()
+})
+
+export const UserLoginResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "department": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string()
+})
+
+
+/**
+ * @summary Guest logout
+ */
+export const UserLogoutResponse = zod.unknown()
+
+
+/**
+ * @summary Get current user session profile
+ */
+export const GetUserMeResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "department": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string()
+})
+
+
+/**
+ * @summary Get digital ticket passes for current logged in user
+ */
+export const GetUserPassesResponseItem = zod.object({
+  "id": zod.number(),
+  "eventId": zod.number(),
+  "eventTitle": zod.string(),
+  "eventDate": zod.string(),
+  "eventVenue": zod.string().nullable(),
+  "status": zod.enum(['pending', 'approved', 'declined', 'waitlisted']),
+  "ticketCode": zod.string().nullish(),
+  "name": zod.string(),
+  "department": zod.string().nullable(),
+  "attendancePossibility": zod.string().nullish(),
+  "checkedIn": zod.boolean().optional(),
+  "createdAt": zod.string()
+})
+export const GetUserPassesResponse = zod.array(GetUserPassesResponseItem)
+
+
+/**
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -97,6 +180,8 @@ export const ListRequestsResponseItem = zod.object({
   "heardAbout": zod.string().nullish(),
   "mutualConnection": zod.string().nullish(),
   "whyAttend": zod.string().nullish(),
+  "department": zod.string().nullish(),
+  "attendancePossibility": zod.string().nullish(),
   "status": zod.enum(['pending', 'approved', 'declined', 'waitlisted']),
   "ticketCode": zod.string().nullish(),
   "checkedIn": zod.boolean().optional(),
@@ -122,7 +207,9 @@ export const CreateRequestBody = zod.object({
   "socialHandle": zod.string().optional(),
   "heardAbout": zod.string().optional(),
   "mutualConnection": zod.string().optional(),
-  "whyAttend": zod.string().optional()
+  "whyAttend": zod.string().optional(),
+  "department": zod.string().optional(),
+  "attendancePossibility": zod.string().optional()
 })
 
 export const CreateRequestResponse = zod.object({
@@ -135,6 +222,8 @@ export const CreateRequestResponse = zod.object({
   "heardAbout": zod.string().nullish(),
   "mutualConnection": zod.string().nullish(),
   "whyAttend": zod.string().nullish(),
+  "department": zod.string().nullish(),
+  "attendancePossibility": zod.string().nullish(),
   "status": zod.enum(['pending', 'approved', 'declined', 'waitlisted']),
   "ticketCode": zod.string().nullish(),
   "checkedIn": zod.boolean().optional(),
@@ -159,6 +248,8 @@ export const GetRequestResponse = zod.object({
   "heardAbout": zod.string().nullish(),
   "mutualConnection": zod.string().nullish(),
   "whyAttend": zod.string().nullish(),
+  "department": zod.string().nullish(),
+  "attendancePossibility": zod.string().nullish(),
   "status": zod.enum(['pending', 'approved', 'declined', 'waitlisted']),
   "ticketCode": zod.string().nullish(),
   "checkedIn": zod.boolean().optional(),
@@ -187,6 +278,8 @@ export const UpdateRequestStatusResponse = zod.object({
   "heardAbout": zod.string().nullish(),
   "mutualConnection": zod.string().nullish(),
   "whyAttend": zod.string().nullish(),
+  "department": zod.string().nullish(),
+  "attendancePossibility": zod.string().nullish(),
   "status": zod.enum(['pending', 'approved', 'declined', 'waitlisted']),
   "ticketCode": zod.string().nullish(),
   "checkedIn": zod.boolean().optional(),

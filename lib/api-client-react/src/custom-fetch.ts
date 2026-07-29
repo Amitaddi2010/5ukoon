@@ -61,6 +61,9 @@ function isUrl(input: RequestInfo | URL): input is URL {
 }
 
 function applyBaseUrl(input: RequestInfo | URL): RequestInfo | URL {
+  if (typeof input === "string" && input.startsWith("/") && !input.startsWith("/api")) {
+    input = `/api${input}`;
+  }
   if (!_baseUrl) return input;
   const url = resolveUrl(input);
   // Only prepend to relative paths (starting with /)

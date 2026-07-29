@@ -18,7 +18,91 @@ tags:
     description: Confirmed guest management and check-in
   - name: admin
     description: Admin authentication
+  - name: user
+    description: User authentication and digital passes
 paths:
+  /user/signup:
+    post:
+      operationId: userSignUp
+      tags: [user]
+      summary: Guest sign up
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserSignUpInput"
+      responses:
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          description: Validation or duplicate email error
+
+  /user/login:
+    post:
+      operationId: userLogin
+      tags: [user]
+      summary: Guest login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Invalid credentials
+
+  /user/logout:
+    post:
+      operationId: userLogout
+      tags: [user]
+      summary: Guest logout
+      responses:
+        "200":
+          description: Logged out
+
+  /user/me:
+    get:
+      operationId: getUserMe
+      tags: [user]
+      summary: Get current user session profile
+      responses:
+        "200":
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Unauthorized
+
+  /user/passes:
+    get:
+      operationId: getUserPasses
+      tags: [user]
+      summary: Get digital ticket passes for current logged in user
+      responses:
+        "200":
+          description: List of user passes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserPass"
+        "401":
+          description: Unauthorized
   /healthz:
     get:
       operationId: healthCheck
@@ -280,6 +364,40 @@ paths:
         "401":
           description: Unauthorized
 
+  /admin/users:
+    get:
+      operationId: listUsers
+      tags: [admin]
+      summary: List all registered accounts
+      responses:
+        "200":
+          description: List of user profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Unauthorized
+
+  /admin/users/{id}:
+    delete:
+      operationId: deleteUser
+      tags: [admin]
+      summary: Delete user account
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User deleted
+        "401":
+          description: Unauthorized
+
   /admin/events/{id}:
     patch:
       operationId: updateEvent
@@ -306,6 +424,42 @@ paths:
           description: Unauthorized
         "500":
           description: Internal server error
+
+  /admin/users:
+    get:
+      operationId: listUsers
+      tags: [admin]
+      summary: List all registered user accounts (admin only)
+      responses:
+        "200":
+          description: List of user accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Unauthorized
+
+  /admin/users/{id}:
+    delete:
+      operationId: deleteUser
+      tags: [admin]
+      summary: Delete a registered user account (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Account deleted successfully
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
 
 components:
   schemas:
@@ -402,6 +556,10 @@ components:
           type: ["string", "null"]
         whyAttend:
           type: ["string", "null"]
+        department:
+          type: ["string", "null"]
+        attendancePossibility:
+          type: ["string", "null"]
         status:
           type: string
           enum: [pending, approved, declined, waitlisted]
@@ -434,6 +592,10 @@ components:
         mutualConnection:
           type: string
         whyAttend:
+          type: string
+        department:
+          type: string
+        attendancePossibility:
           type: string
 
     RequestStatusUpdate:
@@ -486,4 +648,76 @@ components:
         username:
           type: string
         name:
+          type: string
+
+    UserSignUpInput:
+      type: object
+      required: [name, department, phone, email, password]
+      properties:
+        name:
+          type: string
+          minLength: 2
+        department:
+          type: string
+        phone:
+          type: string
+          minLength: 10
+        email:
+          type: string
+        password:
+          type: string
+          minLength: 4
+
+    UserLoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    UserProfile:
+      type: object
+      required: [id, name, department, phone, email]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        department:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+
+    UserPass:
+      type: object
+      required: [id, eventId, eventTitle, eventDate, eventVenue, status, name, department, createdAt]
+      properties:
+        id:
+          type: integer
+        eventId:
+          type: integer
+        eventTitle:
+          type: string
+        eventDate:
+          type: string
+        eventVenue:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, approved, declined, waitlisted]
+        ticketCode:
+          type: ["string", "null"]
+        name:
+          type: string
+        department:
+          type: ["string", "null"]
+        attendancePossibility:
+          type: ["string", "null"]
+        checkedIn:
+          type: boolean
+        createdAt:
           type: string

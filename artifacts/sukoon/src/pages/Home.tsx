@@ -2,6 +2,8 @@ import { Link } from "wouter";
 import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from "framer-motion";
 import { useListEvents } from "@workspace/api-client-react";
 import { Navbar } from "@/components/Navbar";
+import { RegistrationModal } from "@/components/RegistrationModal";
+import { Calendar, ShieldAlert, Sparkles } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import $ from "jquery";
 
@@ -264,20 +266,48 @@ export function ImmersiveWaterBackground() {
 export function Home() {
   const { data: events } = useListEvents();
   const nextEvent = events?.[0];
+  const [isRegModalOpen, setIsRegModalOpen] = useState(false);
 
-  const eventDate = nextEvent
-    ? new Date(nextEvent.date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
-    : "August 9, 2026";
+  // Auto popup modal on initial landing for high visibility
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsRegModalOpen(true);
+    }, 1800);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden relative">
       <ImmersiveWaterBackground />
-      <Navbar />
+      <Navbar onOpenRegisterModal={() => setIsRegModalOpen(true)} />
+      <RegistrationModal isOpen={isRegModalOpen} onClose={() => setIsRegModalOpen(false)} />
 
       {/* ─── HERO ─────────────────────────────────────────────── */}
       <section className="relative h-[100dvh] flex flex-col items-center justify-center overflow-hidden">
         {/* Dark overlay to make text pop */}
         <div className="absolute inset-0 bg-black/40 z-0 pointer-events-none" />
+
+        {/* Floating Saturday Event Announcement Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1 }}
+          className="relative z-10 mb-5 sm:mb-6 cursor-pointer max-w-[92vw]"
+          onClick={() => setIsRegModalOpen(true)}
+        >
+          <div className="inline-flex items-center gap-1.5 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-amber-500/20 border border-amber-400/40 backdrop-blur-md hover:border-amber-300 hover:scale-[1.02] transition-all shadow-xl">
+            <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping shrink-0" />
+            <span className="text-[10px] sm:text-[12px] font-medium text-amber-200 tracking-wide truncate">
+              Sat. 1st August 2026 @ 6:00 PM • ODH Mess Rooftop PGIMER
+            </span>
+            <span className="text-[9px] sm:text-[11px] bg-red-950/80 border border-red-500/40 text-red-300 px-1.5 sm:px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0">
+              PGIMER Only
+            </span>
+            <span className="text-[10px] sm:text-[12px] font-semibold text-white underline underline-offset-2 shrink-0">
+              Register →
+            </span>
+          </div>
+        </motion.div>
 
         {/* Oversized display heading */}
         <div className="relative z-10 text-center px-4">
@@ -322,6 +352,22 @@ export function Home() {
           >
             We gather in intimacy, anchor in art,<br />and leave a little lighter.
           </motion.p>
+          
+          {/* Quick Register CTA Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.1 }}
+            className="mt-8 pointer-events-auto"
+          >
+            <button
+              onClick={() => setIsRegModalOpen(true)}
+              className="inline-flex items-center gap-3 px-8 h-13 rounded-full bg-amber-400 text-black text-[13px] tracking-[0.14em] uppercase font-bold hover:bg-amber-300 hover:scale-105 transition-all shadow-xl shadow-amber-400/20"
+            >
+              <Sparkles className="w-4 h-4 text-black" />
+              <span>Register Now for Saturday</span>
+            </button>
+          </motion.div>
         </div>
 
         {/* Bottom-left: service tags */}
@@ -455,9 +501,9 @@ export function Home() {
                 </svg>
               </div>
               <div>
-                <h3 className="text-2xl font-display text-white mb-2">{nextEvent?.city ?? "Chandigarh, IN"}</h3>
+                <h3 className="text-2xl font-display text-white mb-2">Chandigarh, IN</h3>
                 <p className="text-white/40 text-[13px] leading-relaxed">
-                  An intimate, secret venue.<br />Exact location revealed upon RSVP.
+                  ODH Mess Rooftop, PGIMER<br />Intimate rooftop session for residents & staff.
                 </p>
               </div>
             </div>
@@ -520,16 +566,16 @@ export function Home() {
                  </p>
                </div>
                
-               <Link 
-                 href="/request" 
-                 className="inline-flex items-center justify-center w-full lg:w-auto gap-3 px-8 h-12 sm:h-14 bg-white text-black rounded-full text-[11px] sm:text-[12px] tracking-[0.15em] uppercase font-semibold hover:bg-[var(--accent-gold)] hover:scale-[1.02] transition-all duration-300 shrink-0"
-                 data-cursor-hover
-               >
-                 Request Invitation
-                 <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
-                   <path d="M1 5h14M11 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                 </svg>
-               </Link>
+               <button 
+                  onClick={() => setIsRegModalOpen(true)}
+                  className="inline-flex items-center justify-center w-full lg:w-auto gap-3 px-8 h-12 sm:h-14 bg-amber-400 text-black rounded-full text-[11px] sm:text-[12px] tracking-[0.15em] uppercase font-bold hover:bg-amber-300 hover:scale-[1.02] transition-all duration-300 shrink-0 shadow-lg shadow-amber-400/20"
+                  data-cursor-hover
+                >
+                  Register Now
+                  <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+                    <path d="M1 5h14M11 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
              </div>
           </BentoCard>
 
@@ -570,7 +616,7 @@ export function Home() {
       </section>
 
       {/* ─── 07 FAQ ───────────────────────────────────────────── */}
-      <section className="py-20 md:py-32 px-4 md:px-8 max-w-7xl mx-auto mb-20">
+      <section className="pt-16 pb-12 md:pt-24 md:pb-16 px-4 md:px-8 max-w-7xl mx-auto">
         <SectionPanel className="p-10 md:p-20">
           <div className="grid md:grid-cols-[120px_1fr] gap-12 md:gap-20">
             <motion.div {...fadeUp} className="pt-1">
@@ -614,9 +660,23 @@ export function Home() {
             <a href="mailto:hello@sukoon.com" className="text-[12px] text-white/40 hover:text-[var(--accent-gold)] transition-colors tracking-wide" data-cursor-hover>Contact</a>
           </div>
 
-          <p className="text-[11px] text-white/20 tracking-wide font-light">
-            © {new Date().getFullYear()} Sukoon, Chandigarh
-          </p>
+          <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-right">
+            <p className="text-[12px] text-white/50 tracking-wide font-light">
+              Developed and managed by{" "}
+              <a
+                href="https://amitrajsaraswat.space/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-300 hover:underline font-medium"
+              >
+                Amit Raj Saraswat
+              </a>
+            </p>
+            <span className="hidden md:inline text-white/20">•</span>
+            <p className="text-[11px] text-white/20 tracking-wide font-light">
+              © {new Date().getFullYear()} Sukoon, Chandigarh
+            </p>
+          </div>
         </div>
       </footer>
     </div>
