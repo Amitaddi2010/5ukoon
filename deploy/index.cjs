@@ -31,6 +31,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // ../../node_modules/.pnpm/ms@2.1.3/node_modules/ms/index.js
 var require_ms = __commonJS({
@@ -21320,13 +21321,13 @@ var require_application = __commonJS({
       tryRender(view, renderOptions, done);
     };
     app2.listen = function listen() {
-      var server = http.createServer(this);
+      var server2 = http.createServer(this);
       var args = slice.call(arguments);
       if (typeof args[args.length - 1] === "function") {
         var done = args[args.length - 1] = once(args[args.length - 1]);
-        server.once("error", done);
+        server2.once("error", done);
       }
-      return server.listen.apply(server, args);
+      return server2.listen.apply(server2, args);
     };
     function logerror(err) {
       if (this.get("env") !== "test") console.error(err.stack || err.toString());
@@ -34307,10 +34308,10 @@ var require_websocket_server = __commonJS({
             process.nextTick(emitClose, this);
           }
         } else {
-          const server = this._server;
+          const server2 = this._server;
           this._removeListeners();
           this._removeListeners = this._server = null;
-          server.close(() => {
+          server2.close(() => {
             emitClose(this);
           });
         }
@@ -34495,17 +34496,17 @@ var require_websocket_server = __commonJS({
       }
     };
     module2.exports = WebSocketServer2;
-    function addListeners(server, map2) {
-      for (const event of Object.keys(map2)) server.on(event, map2[event]);
+    function addListeners(server2, map2) {
+      for (const event of Object.keys(map2)) server2.on(event, map2[event]);
       return function removeListeners() {
         for (const event of Object.keys(map2)) {
-          server.removeListener(event, map2[event]);
+          server2.removeListener(event, map2[event]);
         }
       };
     }
-    function emitClose(server) {
-      server._state = CLOSED;
-      server.emit("close");
+    function emitClose(server2) {
+      server2._state = CLOSED;
+      server2.emit("close");
     }
     function socketOnError() {
       this.destroy();
@@ -34524,11 +34525,11 @@ var require_websocket_server = __commonJS({
 ` + Object.keys(headers).map((h) => `${h}: ${headers[h]}`).join("\r\n") + "\r\n\r\n" + message
       );
     }
-    function abortHandshakeOrEmitwsClientError(server, req, socket, code, message, headers) {
-      if (server.listenerCount("wsClientError")) {
+    function abortHandshakeOrEmitwsClientError(server2, req, socket, code, message, headers) {
+      if (server2.listenerCount("wsClientError")) {
         const err = new Error(message);
         Error.captureStackTrace(err, abortHandshakeOrEmitwsClientError);
-        server.emit("wsClientError", err, socket, req);
+        server2.emit("wsClientError", err, socket, req);
       } else {
         abortHandshake(socket, code, message, headers);
       }
@@ -57636,6 +57637,14 @@ var init_src = __esm({
   }
 });
 
+// src/index.ts
+var src_exports2 = {};
+__export(src_exports2, {
+  default: () => src_default,
+  server: () => server
+});
+module.exports = __toCommonJS(src_exports2);
+
 // src/app.ts
 var import_express8 = __toESM(require_express2(), 1);
 var import_cors = __toESM(require_lib3(), 1);
@@ -62463,10 +62472,18 @@ app.use((req, res, next) => {
 var app_default = app;
 
 // src/index.ts
-var rawPort = process.env.PORT || process.env.LSNODE_SOCKET || 3e3;
-var port = typeof rawPort === "string" && !isNaN(Number(rawPort)) ? Number(rawPort) : rawPort;
-app_default.listen(port, () => {
-  logger.info({ port }, `Sukoon server listening on ${port}`);
+var port = Number(process.env.PORT) || 3e3;
+var server = app_default.listen(port, () => {
+  logger.info({ port }, `Sukoon server listening on port ${port}`);
+});
+server.on("error", (err) => {
+  logger.error({ err }, `Server error on port ${port}: ${err.message}`);
+});
+global.__sukoon_server = server;
+var src_default = app_default;
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  server
 });
 /*! Bundled license information:
 
