@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "pnpm run typecheck && pnpm --filter \"./artifacts/api-server\" --filter \"./artifacts/sukoon\" run build && node scripts/postbuild.mjs",
+    "build": "npx --yes pnpm run typecheck && npx --yes pnpm --filter \"./artifacts/api-server\" --filter \"./artifacts/sukoon\" run build && node scripts/postbuild.mjs",
     "typecheck:libs": "tsc --build",
-    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
-    "hostinger-build": "npx pnpm install --force && node scripts/update-price.mjs && npx pnpm run build",
+    "typecheck": "npx --yes pnpm run typecheck:libs && npx --yes pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
+    "hostinger-build": "npx --yes pnpm install --force && node scripts/update-price.mjs && npx --yes pnpm run build",
     "start": "node artifacts/api-server/dist/index.mjs"
   },
   "private": true,
