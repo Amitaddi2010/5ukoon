@@ -1,41 +1,64 @@
-// Hostinger LiteSpeed lsnode Entry Point
-// Test: create a bare http.createServer to verify lsnode interception
-const http = require("http");
+// Hostinger LiteSpeed / Phusion Passenger Entry Point
 const fs = require("fs");
 const path = require("path");
 
 const logFile = path.join(__dirname, "startup-error.log");
 
 process.on("unhandledRejection", (reason) => {
-  fs.appendFileSync(logFile, `[${new Date().toISOString()}] Unhandled Rejection: ${reason}\n`);
+  console.error("Unhandled Rejection:", reason);
+  try {
+    fs.appendFileSync(logFile, `[${new Date().toISOString()}] Unhandled Rejection: ${reason}\n`);
+  } catch {}
 });
+
 process.on("uncaughtException", (err) => {
-  fs.appendFileSync(logFile, `[${new Date().toISOString()}] Uncaught Exception: ${err.message}\n${err.stack}\n`);
+  console.error("Uncaught Exception:", err);
+  try {
+    fs.appendFileSync(logFile, `[${new Date().toISOString()}] Uncaught Exception: ${err.message}\n${err.stack}\n`);
+  } catch {}
 });
 
 process.env.NODE_ENV = process.env.NODE_ENV || "production";
 
-fs.writeFileSync(logFile, `[${new Date().toISOString()}] Starting app.cjs\n` +
-  `  CWD: ${process.cwd()}\n` +
-  `  __dirname: ${__dirname}\n` +
-  `  LSNODE_SOCKET: ${process.env.LSNODE_SOCKET || "(none)"}\n` +
-  `  Node: ${process.version}\n`);
+try {
+  fs.appendFileSync(
+    logFile,
+    `[${new Date().toISOString()}] Starting Sukoon Production Server\n` +
+      `  CWD: ${process.cwd()}\n` +
+      `  __dirname: ${__dirname}\n` +
+      `  Node: ${process.version}\n`
+  );
+} catch {}
 
-// Step 1: Create a bare http server to test if lsnode intercepts it
-const server = http.createServer((req, res) => {
-  fs.appendFileSync(logFile, `[${new Date().toISOString()}] REQUEST: ${req.method} ${req.url}\n`);
-
-  // Try loading Express app for real requests
+async function startServer() {
   try {
-    const app = require("./artifacts/api-server/dist/index.cjs");
-  } catch (e) {
-    // Already loaded or error — ignore
+    // Run database schema check / init script
+    await import("./scripts/init-db.mjs").catch((err) => {
+      try {
+        fs.appendFileSync(logFile, `[${new Date().toISOString()}] DB init notice: ${err.message}\n`);
+      } catch {}
+    });
+
+    // Import main compiled Express API & static frontend server
+    await import("./artifacts/api-server/dist/index.mjs");
+    try {
+      fs.appendFileSync(logFile, `[${new Date().toISOString()}] Express server started successfully.\n`);
+    } catch {}
+  } catch (err) {
+    try {
+      fs.appendFileSync(logFile, `[${new Date().toISOString()}] Error starting ES module server, attempting CJS fallback: ${err.message}\n`);
+    } catch {}
+    try {
+      require("./artifacts/api-server/dist/index.cjs");
+    } catch (cjsErr) {
+      try {
+        fs.appendFileSync(logFile, `[${new Date().toISOString()}] Critical startup failure: ${cjsErr.message}\n${cjsErr.stack}\n`);
+      } catch {}
+      throw cjsErr;
+    }
   }
+}
 
-  res.writeHead(200, { "Content-Type": "text/html" });
-  res.end("<h1>Sukoon Server is Running!</h1><p>LiteSpeed lsnode connection verified.</p>");
-});
-
-server.listen(3000, () => {
-  fs.appendFileSync(logFile, `[${new Date().toISOString()}] http.createServer listening on 3000\n`);
+startServer().catch((err) => {
+  console.error("Failed to launch Sukoon application:", err);
 });
