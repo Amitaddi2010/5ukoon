@@ -121,6 +121,16 @@ PassengerAppType node
 PassengerStartupFile app.cjs
 PassengerAppEnv production
 PassengerFriendlyErrorPages on
+
+DirectoryIndex disabled
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ app.cjs [L,QSA]
+</IfModule>
 `;
 fs.writeFileSync(path.resolve(deployDir, '.htaccess'), htaccessContent);
 
