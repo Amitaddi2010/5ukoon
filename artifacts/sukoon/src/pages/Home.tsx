@@ -288,41 +288,46 @@ export function Home() {
       <RegistrationModal isOpen={isRegModalOpen} onClose={() => setIsRegModalOpen(false)} />
 
       {/* ─── HERO ─────────────────────────────────────────────── */}
-      <section className="relative h-[100dvh] flex flex-col items-center justify-center overflow-hidden">
+      <section className="relative min-h-[100dvh] flex flex-col justify-between items-center px-4 pt-24 pb-8 md:py-0 md:justify-center overflow-hidden">
         {/* Dark overlay to make text pop */}
         <div className="absolute inset-0 bg-black/40 z-0 pointer-events-none" />
 
-        {/* Floating Saturday Event Announcement Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          className="relative z-10 mb-5 sm:mb-6 cursor-pointer max-w-[92vw]"
-          onClick={() => setIsRegModalOpen(true)}
-        >
-          <div className="inline-flex items-center gap-1.5 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-amber-500/20 border border-amber-400/40 backdrop-blur-md hover:border-amber-300 hover:scale-[1.02] transition-all shadow-xl">
-            <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping shrink-0" />
-            <span className="text-[10px] sm:text-[12px] font-medium text-amber-200 tracking-wide truncate">
-              Sat. 1st August 2026 @ 6:00 PM • ODH Mess Rooftop PGIMER
-            </span>
-            <span className="text-[9px] sm:text-[11px] bg-red-950/80 border border-red-500/40 text-red-300 px-1.5 sm:px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0">
-              PGIMER Only
-            </span>
-            <span className="text-[10px] sm:text-[12px] font-semibold text-white underline underline-offset-2 shrink-0">
-              Register →
-            </span>
-          </div>
-        </motion.div>
+        {/* Top Spacer for MD to balance vertical alignment */}
+        <div className="hidden md:block md:flex-1" />
 
-        {/* Oversized display heading */}
-        <div className="relative z-10 text-center px-4">
+        {/* Main Hero Content Box */}
+        <div className="relative z-10 flex flex-col items-center text-center my-auto w-full max-w-4xl py-2 sm:py-6">
+          {/* Floating Saturday Event Announcement Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1 }}
+            className="mb-4 sm:mb-6 cursor-pointer max-w-[95vw] sm:max-w-max"
+            onClick={() => setIsRegModalOpen(true)}
+          >
+            <div className="inline-flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-amber-500/20 border border-amber-400/40 backdrop-blur-md hover:border-amber-300 hover:scale-[1.02] transition-all shadow-xl max-w-full">
+              <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping shrink-0" />
+              <span className="text-[10px] sm:text-[12px] font-medium text-amber-200 tracking-wide truncate">
+                Sat. 1st Aug 2026 @ 6:00 PM • Rooftop PGIMER
+              </span>
+              <span className="text-[8px] sm:text-[10px] bg-red-950/90 border border-red-500/40 text-red-300 px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0">
+                PGIMER Only
+              </span>
+              <span className="text-[10px] sm:text-[12px] font-semibold text-white underline underline-offset-2 shrink-0">
+                Register →
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Oversized display heading */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+            className="w-full"
           >
             <h1
-              className="text-[18vw] md:text-[14vw] lg:text-[12vw] leading-[0.85] tracking-[-0.03em] text-white select-none pointer-events-none drop-shadow-2xl"
+              className="text-[20vw] sm:text-[16vw] md:text-[13vw] lg:text-[11vw] leading-[0.85] tracking-[-0.03em] text-white select-none pointer-events-none drop-shadow-2xl"
               style={{ fontFamily: "var(--app-font-display-heavy)" }}
             >
               <motion.span
@@ -353,7 +358,7 @@ export function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.2, delay: 0.7 }}
-            className="mt-6 text-[15px] md:text-[16px] leading-relaxed text-white/70 font-light max-w-sm mx-auto pointer-events-none"
+            className="mt-4 sm:mt-6 text-[13px] sm:text-[15px] md:text-[16px] leading-relaxed text-white/70 font-light max-w-xs sm:max-w-sm mx-auto pointer-events-none px-2"
           >
             We gather in intimacy, anchor in art,<br />and leave a little lighter.
           </motion.p>
@@ -363,61 +368,67 @@ export function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.1 }}
-            className="mt-8 pointer-events-auto"
+            className="mt-6 sm:mt-8 pointer-events-auto"
           >
             <button
               onClick={() => setIsRegModalOpen(true)}
-              className="inline-flex items-center gap-3 px-8 h-13 rounded-full bg-amber-400 text-black text-[13px] tracking-[0.14em] uppercase font-bold hover:bg-amber-300 hover:scale-105 transition-all shadow-xl shadow-amber-400/20"
+              className="inline-flex items-center gap-2.5 px-6 sm:px-8 h-11 sm:h-13 rounded-full bg-amber-400 text-black text-[11px] sm:text-[13px] tracking-[0.14em] uppercase font-bold hover:bg-amber-300 hover:scale-105 transition-all shadow-xl shadow-amber-400/20"
             >
-              <Sparkles className="w-4 h-4 text-black" />
+              <Sparkles className="w-4 h-4 text-black shrink-0" />
               <span>Register Now for Saturday</span>
             </button>
           </motion.div>
         </div>
 
-        {/* Bottom-left: service tags */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.9 }}
-          className="absolute bottom-7 left-6 md:left-10 flex flex-col gap-[5px] z-10 pointer-events-none"
-        >
-          {["LIVE MUSIC", "SHAYARI", "STORYTELLING", "GUIDED CIRCLES", "CHANDIGARH, INDIA"].map((tag) => (
-            <span key={tag} className="text-[11px] tracking-[0.14em] text-white/40 uppercase font-medium">
-              {tag}
-            </span>
-          ))}
-        </motion.div>
+        {/* Bottom Spacer for MD */}
+        <div className="hidden md:block md:flex-1" />
 
-        {/* Bottom-center: scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.2 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10 pointer-events-none"
-        >
-          <motion.svg
-            animate={{ y: [0, 4, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-white/40"
+        {/* Bottom Bar — Responsive Footer Items */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 pt-4 md:absolute md:bottom-8 md:left-1/2 md:-translate-x-1/2 md:px-10 pointer-events-none">
+          {/* Service tags — hidden on mobile to avoid text collision, visible on desktop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.9 }}
+            className="hidden md:flex flex-col gap-[3px]"
           >
-            <path d="M7 1v12M1 7l6 6 6-6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
-          </motion.svg>
-          <span className="text-[11px] tracking-[0.18em] text-white/40 uppercase font-medium">Scroll to explore</span>
-        </motion.div>
+            {["LIVE MUSIC", "SHAYARI", "STORYTELLING", "GUIDED CIRCLES", "CHANDIGARH, INDIA"].map((tag) => (
+              <span key={tag} className="text-[11px] tracking-[0.14em] text-white/40 uppercase font-medium text-left">
+                {tag}
+              </span>
+            ))}
+          </motion.div>
 
-        {/* Bottom-right: edition label */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="absolute bottom-8 right-6 md:right-10 z-10 pointer-events-none"
-        >
-          <span className="text-[11px] tracking-[0.18em] text-white/50 uppercase font-medium flex items-center gap-2">
-            <span className="accent-dot" />
-            FEATURED EDITION /01
-          </span>
-        </motion.div>
+          {/* Center: scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1.2 }}
+            className="flex items-center gap-2"
+          >
+            <motion.svg
+              animate={{ y: [0, 4, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-white/40"
+            >
+              <path d="M7 1v12M1 7l6 6 6-6" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+            </motion.svg>
+            <span className="text-[10px] sm:text-[11px] tracking-[0.18em] text-white/40 uppercase font-medium">Scroll to explore</span>
+          </motion.div>
+
+          {/* Right: edition label */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1 }}
+            className="hidden sm:block"
+          >
+            <span className="text-[10px] sm:text-[11px] tracking-[0.18em] text-white/50 uppercase font-medium flex items-center gap-2">
+              <span className="accent-dot" />
+              FEATURED EDITION /01
+            </span>
+          </motion.div>
+        </div>
       </section>
 
       {/* ─── 01 THE MISSING MIDDLE ────────────────────────────── */}
