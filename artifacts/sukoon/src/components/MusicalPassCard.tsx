@@ -22,18 +22,42 @@ export interface MusicalPassCardProps {
 }
 
 function parseEventDate(val: any): Date {
-  if (!val) return new Date("2026-08-01T12:30:00.000Z");
-  if (val instanceof Date) return isNaN(val.getTime()) ? new Date("2026-08-01T12:30:00.000Z") : val;
-  if (typeof val === "number") return new Date(val);
-  if (typeof val === "string") {
+  const DEFAULT_DATE = new Date("2026-08-01T12:30:00.000Z");
+
+  if (!val) return DEFAULT_DATE;
+  if (val instanceof Date) {
+    if (isNaN(val.getTime()) || val.getFullYear() < 2020 || val.getFullYear() > 2100) return DEFAULT_DATE;
+    return val;
+  }
+
+  let num: number | null = null;
+  if (typeof val === "number") {
+    num = val;
+  } else if (typeof val === "string") {
     const trimmed = val.trim();
     if (/^\d+$/.test(trimmed)) {
-      return new Date(Number(trimmed));
+      num = Number(trimmed);
+    } else {
+      const d = new Date(trimmed);
+      if (!isNaN(d.getTime())) {
+        if (d.getFullYear() < 2020 || d.getFullYear() > 2100) return DEFAULT_DATE;
+        return d;
+      }
     }
-    const d = new Date(trimmed);
-    return isNaN(d.getTime()) ? new Date("2026-08-01T12:30:00.000Z") : d;
   }
-  return new Date("2026-08-01T12:30:00.000Z");
+
+  if (num !== null) {
+    if (num < 10000000000) {
+      num = num * 1000;
+    }
+    const d = new Date(num);
+    if (!isNaN(d.getTime())) {
+      if (d.getFullYear() < 2020 || d.getFullYear() > 2100) return DEFAULT_DATE;
+      return d;
+    }
+  }
+
+  return DEFAULT_DATE;
 }
 
 function escapeHtml(str: string): string {
