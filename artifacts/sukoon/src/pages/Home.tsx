@@ -268,12 +268,17 @@ export function Home() {
   const nextEvent = events?.[0];
   const [isRegModalOpen, setIsRegModalOpen] = useState(false);
 
-  // Auto popup modal on initial landing for high visibility
+  // Auto popup modal on initial landing for high visibility (only once per session)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsRegModalOpen(true);
-    }, 1800);
-    return () => clearTimeout(timer);
+    const hasSeenPopup = sessionStorage.getItem("hasSeenSukoonRegPopup");
+    if (!hasSeenPopup) {
+      sessionStorage.setItem("hasSeenSukoonRegPopup", "true");
+      const timer = setTimeout(() => {
+        setIsRegModalOpen(true);
+      }, 1800);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
   }, []);
 
   return (
