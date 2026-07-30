@@ -144,7 +144,7 @@ export function MusicalPassCard({ pass, autoDownload }: MusicalPassCardProps) {
 
             <div class="info-box">
               <div><strong>Guest Name:</strong> ${escapeHtml(pass.name)} (${escapeHtml(pass.department || 'PGIMER')})</div>
-              <div><strong>📅 Date & Time:</strong> ${format(new Date(pass.eventDate), "EEEE, MMM d, yyyy @ 6:00 PM")}</div>
+              <div><strong>📅 Date & Time:</strong> ${format(new Date(pass.eventDate), "EEEE, MMM d, yyyy '@' h:mm a")}</div>
               <div><strong>📍 Venue:</strong> ${escapeHtml(pass.eventVenue || 'ODH Mess Rooftop, PGIMER Chandigarh')}</div>
               <div><strong>Status:</strong> ${isApproved ? 'CONFIRMED GUEST' : 'UNDER VALIDATION'}</div>
             </div>
