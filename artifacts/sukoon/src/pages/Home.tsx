@@ -478,7 +478,7 @@ export function Home() {
              </p>
           </motion.div>
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[300px] md:auto-rows-[400px]">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 auto-rows-auto md:auto-rows-[400px]">
           
           {/* Card 1: Artist Lineup (Span 2 cols) */}
           <BentoCard className="md:col-span-2">
@@ -554,7 +554,7 @@ export function Home() {
           <AudioPreviewCard />
 
           {/* Card 5: Tickets & Call to Action (Span 2 cols) */}
-          <BentoCard id="edition" className="md:col-span-2 p-8 sm:p-10 md:p-12 flex flex-col justify-between items-start">
+          <BentoCard id="edition" className="md:col-span-2 p-6 sm:p-10 md:p-12 flex flex-col justify-between items-start min-h-[340px] md:min-h-0">
              <div className="absolute inset-0 bg-gradient-to-t from-[var(--accent-gold)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
              <div className="absolute inset-0 backdrop-blur-3xl" />
              
@@ -563,10 +563,10 @@ export function Home() {
                <span className="text-[10px] sm:text-[11px] tracking-[0.2em] text-white/50 uppercase font-medium border border-white/10 px-3 py-1 rounded-full">25 Seats Only</span>
              </div>
              
-             <div className="relative z-10 mt-12 sm:mt-auto w-full flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+             <div className="relative z-10 mt-6 sm:mt-auto w-full flex flex-col lg:flex-row lg:items-end justify-between gap-6 sm:gap-8">
                <div className="max-w-xl">
-                 <AnimatedText text="Reserve your spot at Sukoon" className="text-3xl sm:text-4xl md:text-5xl font-display text-white mb-4 tracking-[-0.02em] leading-tight" delay={1} />
-                 <p className="text-white/50 text-[13px] sm:text-[14px] leading-relaxed flex items-center gap-2 flex-wrap">
+                 <AnimatedText text="Reserve your spot at Sukoon" className="text-2xl sm:text-4xl md:text-5xl font-display text-white mb-3 sm:mb-4 tracking-[-0.02em] leading-tight" delay={1} />
+                 <p className="text-white/50 text-[12px] sm:text-[14px] leading-relaxed flex items-center gap-2 flex-wrap">
                    <span>Applications reviewed on a rolling basis.</span>
                    <span className="flex items-center gap-2">
                      <span className="text-white/90 font-medium">Entry: ₹{nextEvent?.price ?? "299"}</span>
