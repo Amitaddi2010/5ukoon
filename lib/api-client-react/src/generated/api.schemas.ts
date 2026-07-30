@@ -48,10 +48,32 @@ export interface EventStats {
   arrived: number;
 }
 
-export interface EventUpdateInput {
+export interface EventCreateInput {
+  title: string;
+  editionNumber?: number;
+  date: string;
+  city?: string;
+  venue?: string;
+  capacity?: number;
   price?: number;
   originalPrice?: number;
   offerText?: string;
+  status?: EventStatus;
+  rsvpLink?: string;
+}
+
+export interface EventUpdateInput {
+  title?: string;
+  editionNumber?: number;
+  date?: string;
+  city?: string;
+  venue?: string;
+  capacity?: number;
+  price?: number;
+  originalPrice?: number;
+  offerText?: string;
+  status?: EventStatus;
+  rsvpLink?: string;
 }
 
 export type AttendanceRequestStatus = typeof AttendanceRequestStatus[keyof typeof AttendanceRequestStatus];

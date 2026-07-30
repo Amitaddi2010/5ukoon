@@ -25,6 +25,7 @@ import type {
   AttendanceRequest,
   AttendanceRequestInput,
   Event,
+  EventCreateInput,
   EventStats,
   EventUpdateInput,
   Guest,
@@ -1510,6 +1511,62 @@ export const useUpdateEvent = <TError = ErrorType<void>,
       > => {
       return useMutation(getUpdateEventMutationOptions(options));
     }
+
+export const getCreateEventUrl = () => `/api/admin/events`;
+
+export const createEvent = async (eventCreateInput: EventCreateInput, options?: RequestInit): Promise<Event> => {
+  return customFetch<Event>(getCreateEventUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(eventCreateInput),
+  });
+};
+
+export const getCreateEventMutationOptions = <TError = ErrorType<void>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError, { data: BodyType<EventCreateInput> }, TContext>; request?: SecondParameter<typeof customFetch> }
+): UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError, { data: BodyType<EventCreateInput> }, TContext> => {
+  const mutationKey = ['createEvent'];
+  const { mutation: mutationOptions, request: requestOptions } = options ? (options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ? options : { ...options, mutation: { ...options.mutation, mutationKey } }) : { mutation: { mutationKey }, request: undefined };
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createEvent>>, { data: BodyType<EventCreateInput> }> = (props) => {
+    const { data } = props ?? {};
+    return createEvent(data, requestOptions);
+  };
+  return { mutationFn, ...mutationOptions };
+};
+
+export const useCreateEvent = <TError = ErrorType<void>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError, { data: BodyType<EventCreateInput> }, TContext>; request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof createEvent>>, TError, { data: BodyType<EventCreateInput> }, TContext> => {
+  return useMutation(getCreateEventMutationOptions(options));
+};
+
+export const getDeleteEventUrl = (id: number) => `/api/admin/events/${id}`;
+
+export const deleteEvent = async (id: number, options?: RequestInit): Promise<void> => {
+  return customFetch<void>(getDeleteEventUrl(id), {
+    ...options,
+    method: 'DELETE',
+  });
+};
+
+export const getDeleteEventMutationOptions = <TError = ErrorType<void>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteEvent>>, TError, { id: number }, TContext>; request?: SecondParameter<typeof customFetch> }
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvent>>, TError, { id: number }, TContext> => {
+  const mutationKey = ['deleteEvent'];
+  const { mutation: mutationOptions, request: requestOptions } = options ? (options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ? options : { ...options, mutation: { ...options.mutation, mutationKey } }) : { mutation: { mutationKey }, request: undefined };
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvent>>, { id: number }> = (props) => {
+    const { id } = props ?? {};
+    return deleteEvent(id, requestOptions);
+  };
+  return { mutationFn, ...mutationOptions };
+};
+
+export const useDeleteEvent = <TError = ErrorType<void>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteEvent>>, TError, { id: number }, TContext>; request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof deleteEvent>>, TError, { id: number }, TContext> => {
+  return useMutation(getDeleteEventMutationOptions(options));
+};
 
 export const getListUsersUrl = () => `/admin/users`;
 

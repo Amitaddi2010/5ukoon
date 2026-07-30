@@ -59,23 +59,127 @@ router.get("/admin/me", (req, res) => {
   return res.json(admin);
 });
 
-// PATCH /admin/events/:id - Update pricing and offers
+// POST /admin/events - Create new event
+router.post("/admin/events", async (req, res) => {
+  if (!(req.session as any)?.admin) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const { eventsTable } = await import("@workspace/db");
+    const {
+      title,
+      editionNumber,
+      date,
+      city,
+      venue,
+      capacity,
+      price,
+      originalPrice,
+      offerText,
+      status,
+      rsvpLink,
+    } = req.body;
+
+    if (!title || !date) {
+      return res.status(400).json({ error: "Title and Date are required" });
+    }
+
+    let parsedDate: Date;
+    if (date instanceof Date) {
+      parsedDate = date;
+    } else if (typeof date === "number") {
+      parsedDate = new Date(date < 10000000000 ? date * 1000 : date);
+    } else {
+      const trimmed = String(date).trim();
+      if (/^\d+$/.test(trimmed)) {
+        const num = Number(trimmed);
+        parsedDate = new Date(num < 10000000000 ? num * 1000 : num);
+      } else {
+        parsedDate = new Date(trimmed);
+      }
+    }
+    if (isNaN(parsedDate.getTime())) {
+      parsedDate = new Date("2026-08-01T12:30:00.000Z");
+    }
+
+    const [newEvent] = await db
+      .insert(eventsTable)
+      .values({
+        title,
+        editionNumber: Number(editionNumber) || 1,
+        date: parsedDate,
+        city: city || "Chandigarh",
+        venue: venue || null,
+        capacity: capacity ? Number(capacity) : 25,
+        price: price !== undefined ? Number(price) : 299,
+        originalPrice: originalPrice ? Number(originalPrice) : null,
+        offerText: offerText || null,
+        status: status || "upcoming",
+        rsvpLink: rsvpLink || null,
+        createdAt: new Date(),
+      })
+      .returning();
+
+    return res.status(201).json(newEvent);
+  } catch (err) {
+    req.log.error({ err }, "Failed to create event");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// PATCH /admin/events/:id - Update all event details
 router.patch("/admin/events/:id", async (req, res) => {
   if (!(req.session as any)?.admin) return res.status(401).json({ error: "Unauthorized" });
   const id = Number(req.params.id);
   if (!id) return res.status(400).json({ error: "Invalid event ID" });
 
   try {
-    // Dynamically import eventsTable from db to avoid circular/missing imports if it was missing
     const { eventsTable } = await import("@workspace/db");
     
-    const { price, originalPrice, offerText } = req.body;
+    const {
+      title,
+      editionNumber,
+      date,
+      city,
+      venue,
+      capacity,
+      price,
+      originalPrice,
+      offerText,
+      status,
+      rsvpLink,
+    } = req.body;
     
-    // We update only the fields that were provided
     const updateData: any = {};
-    if (price !== undefined) updateData.price = price;
-    if (originalPrice !== undefined) updateData.originalPrice = originalPrice;
-    if (offerText !== undefined) updateData.offerText = offerText;
+    if (title !== undefined) updateData.title = title;
+    if (editionNumber !== undefined) updateData.editionNumber = Number(editionNumber);
+    if (city !== undefined) updateData.city = city;
+    if (venue !== undefined) updateData.venue = venue;
+    if (capacity !== undefined) updateData.capacity = Number(capacity);
+    if (price !== undefined) updateData.price = Number(price);
+    if (originalPrice !== undefined) updateData.originalPrice = originalPrice ? Number(originalPrice) : null;
+    if (offerText !== undefined) updateData.offerText = offerText || null;
+    if (status !== undefined) updateData.status = status;
+    if (rsvpLink !== undefined) updateData.rsvpLink = rsvpLink || null;
+
+    if (date !== undefined) {
+      let parsedDate: Date;
+      if (date instanceof Date) {
+        parsedDate = date;
+      } else if (typeof date === "number") {
+        parsedDate = new Date(date < 10000000000 ? date * 1000 : date);
+      } else {
+        const trimmed = String(date).trim();
+        if (/^\d+$/.test(trimmed)) {
+          const num = Number(trimmed);
+          parsedDate = new Date(num < 10000000000 ? num * 1000 : num);
+        } else {
+          parsedDate = new Date(trimmed);
+        }
+      }
+      if (!isNaN(parsedDate.getTime())) {
+        updateData.date = parsedDate;
+      }
+    }
 
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ error: "No fields to update" });
@@ -86,6 +190,27 @@ router.patch("/admin/events/:id", async (req, res) => {
     return res.json({ ok: true });
   } catch (err) {
     req.log.error({ err }, "Failed to update event details");
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// DELETE /admin/events/:id - Delete an event
+router.delete("/admin/events/:id", async (req, res) => {
+  if (!(req.session as any)?.admin) return res.status(401).json({ error: "Unauthorized" });
+  const id = Number(req.params.id);
+  if (!id) return res.status(400).json({ error: "Invalid event ID" });
+
+  try {
+    const { eventsTable, attendanceRequestsTable, guestsTable } = await import("@workspace/db");
+
+    // Clean up dependent records first
+    await db.delete(guestsTable).where(eq(guestsTable.eventId, id));
+    await db.delete(attendanceRequestsTable).where(eq(attendanceRequestsTable.eventId, id));
+    await db.delete(eventsTable).where(eq(eventsTable.id, id));
+
+    return res.json({ message: "Event deleted successfully" });
+  } catch (err) {
+    req.log.error({ err }, "Failed to delete event");
     return res.status(500).json({ error: "Internal server error" });
   }
 });
