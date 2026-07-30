@@ -61812,6 +61812,20 @@ init_src();
 init_src();
 init_drizzle_orm();
 var router2 = (0, import_express2.Router)();
+function toIsoDate(val) {
+  if (!val) return (/* @__PURE__ */ new Date("2026-08-01T12:30:00.000Z")).toISOString();
+  if (val instanceof Date) return isNaN(val.getTime()) ? (/* @__PURE__ */ new Date("2026-08-01T12:30:00.000Z")).toISOString() : val.toISOString();
+  if (typeof val === "number") return new Date(val).toISOString();
+  if (typeof val === "string") {
+    const trimmed = val.trim();
+    if (/^\d+$/.test(trimmed)) {
+      return new Date(Number(trimmed)).toISOString();
+    }
+    const d = new Date(trimmed);
+    return isNaN(d.getTime()) ? (/* @__PURE__ */ new Date("2026-08-01T12:30:00.000Z")).toISOString() : d.toISOString();
+  }
+  return (/* @__PURE__ */ new Date("2026-08-01T12:30:00.000Z")).toISOString();
+}
 router2.get("/events", async (req, res) => {
   try {
     const events = await db.select().from(eventsTable).orderBy(eventsTable.date);
@@ -61819,8 +61833,8 @@ router2.get("/events", async (req, res) => {
       events.map((e) => ({
         ...e,
         price: Number(e.price),
-        date: e.date.toISOString(),
-        createdAt: e.createdAt.toISOString()
+        date: toIsoDate(e.date),
+        createdAt: toIsoDate(e.createdAt)
       }))
     );
   } catch (err) {
@@ -61837,8 +61851,8 @@ router2.get("/events/:id", async (req, res) => {
     return res.json({
       ...event,
       price: Number(event.price),
-      date: event.date.toISOString(),
-      createdAt: event.createdAt.toISOString()
+      date: toIsoDate(event.date),
+      createdAt: toIsoDate(event.createdAt)
     });
   } catch (err) {
     req.log.error({ err }, "Failed to get event");

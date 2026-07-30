@@ -14,8 +14,9 @@ async function main() {
     try { await sqlite.execute("ALTER TABLE events ADD COLUMN original_price REAL"); } catch (e) {}
     try { await sqlite.execute("ALTER TABLE events ADD COLUMN offer_text TEXT"); } catch (e) {}
 
-    await sqlite.execute("UPDATE events SET price = '299'");
-    console.log("Successfully updated all event prices to 299 in the database.");
+    const eventDateTimestamp = new Date("2026-08-01T12:30:00.000Z").getTime();
+    await sqlite.execute("UPDATE events SET price = '299', date = ?", [eventDateTimestamp]);
+    console.log("Successfully updated all event prices to 299 and date to Saturday Aug 1, 2026 @ 6:00 PM in the database.");
   } catch (err) {
     console.log("Database not initialized yet or error occurred: ", err.message);
   }

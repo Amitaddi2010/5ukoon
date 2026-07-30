@@ -21,6 +21,21 @@ export interface MusicalPassCardProps {
   onDownload?: () => void;
 }
 
+function parseEventDate(val: any): Date {
+  if (!val) return new Date("2026-08-01T12:30:00.000Z");
+  if (val instanceof Date) return isNaN(val.getTime()) ? new Date("2026-08-01T12:30:00.000Z") : val;
+  if (typeof val === "number") return new Date(val);
+  if (typeof val === "string") {
+    const trimmed = val.trim();
+    if (/^\d+$/.test(trimmed)) {
+      return new Date(Number(trimmed));
+    }
+    const d = new Date(trimmed);
+    return isNaN(d.getTime()) ? new Date("2026-08-01T12:30:00.000Z") : d;
+  }
+  return new Date("2026-08-01T12:30:00.000Z");
+}
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, "&amp;")
@@ -144,7 +159,7 @@ export function MusicalPassCard({ pass, autoDownload }: MusicalPassCardProps) {
 
             <div class="info-box">
               <div><strong>Guest Name:</strong> ${escapeHtml(pass.name)} (${escapeHtml(pass.department || 'PGIMER')})</div>
-              <div><strong>📅 Date & Time:</strong> ${format(new Date(pass.eventDate), "EEEE, MMM d, yyyy '@' h:mm a")}</div>
+              <div><strong>📅 Date & Time:</strong> ${format(parseEventDate(pass.eventDate), "EEEE, MMM d, yyyy '@' h:mm a")}</div>
               <div><strong>📍 Venue:</strong> ${escapeHtml(pass.eventVenue || 'ODH Mess Rooftop, PGIMER Chandigarh')}</div>
               <div><strong>Status:</strong> ${isApproved ? 'CONFIRMED GUEST' : 'UNDER VALIDATION'}</div>
             </div>

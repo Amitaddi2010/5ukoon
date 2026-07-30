@@ -5,6 +5,21 @@ import { eq, count, and } from "drizzle-orm";
 
 const router = Router();
 
+function toIsoDate(val: any): string {
+  if (!val) return new Date("2026-08-01T12:30:00.000Z").toISOString();
+  if (val instanceof Date) return isNaN(val.getTime()) ? new Date("2026-08-01T12:30:00.000Z").toISOString() : val.toISOString();
+  if (typeof val === "number") return new Date(val).toISOString();
+  if (typeof val === "string") {
+    const trimmed = val.trim();
+    if (/^\d+$/.test(trimmed)) {
+      return new Date(Number(trimmed)).toISOString();
+    }
+    const d = new Date(trimmed);
+    return isNaN(d.getTime()) ? new Date("2026-08-01T12:30:00.000Z").toISOString() : d.toISOString();
+  }
+  return new Date("2026-08-01T12:30:00.000Z").toISOString();
+}
+
 // GET /events — list upcoming public events
 router.get("/events", async (req, res) => {
   try {
@@ -16,8 +31,8 @@ router.get("/events", async (req, res) => {
       events.map((e: any) => ({
         ...e,
         price: Number(e.price),
-        date: e.date.toISOString(),
-        createdAt: e.createdAt.toISOString(),
+        date: toIsoDate(e.date),
+        createdAt: toIsoDate(e.createdAt),
       }))
     );
   } catch (err) {
@@ -37,8 +52,8 @@ router.get("/events/:id", async (req, res) => {
     return res.json({
       ...event,
       price: Number(event.price),
-      date: event.date.toISOString(),
-      createdAt: event.createdAt.toISOString(),
+      date: toIsoDate(event.date),
+      createdAt: toIsoDate(event.createdAt),
     });
   } catch (err) {
     req.log.error({ err }, "Failed to get event");
