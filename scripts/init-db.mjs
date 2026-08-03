@@ -138,9 +138,9 @@ async function initDb() {
     if (Number(adminCheck.rows[0]?.count || 0) === 0) {
       await client.execute({
         sql: "INSERT INTO admins (username, password_hash, name, created_at) VALUES (?, ?, ?, ?);",
-        args: ["admin", hashPassword("sukoon2026"), "Sukoon Admin", Date.now()],
+        args: ["admin", hashPassword("sukoon2026"), "Sukoon Admin", Math.floor(Date.now() / 1000)],
       });
-      console.log("✅ Seeded default admin account");
+      console.log("🟢 Seeded default admin account");
     }
 
     // Seed default event if empty
@@ -152,19 +152,29 @@ async function initDb() {
         args: [
           "Sukoon Mehfil – Rooftop Session",
           1,
-          new Date("2026-08-01T18:00:00Z").getTime(),
+          Math.floor(new Date("2026-08-01T12:30:00Z").getTime() / 1000), // Aug 1 2026 18:00 IST
           "Chandigarh",
           "ODH Mess Rooftop, PGIMER",
           25,
           299,
           499,
           "Early Bird Offer",
-          "upcoming",
+          "past",
           null,
-          Date.now(),
+          Math.floor(Date.now() / 1000),
         ],
       });
-      console.log("✅ Seeded default Sukoon event");
+      console.log("🟢 Seeded default Sukoon event");
+      
+      // Also restore the guests data dynamically
+      try {
+        const restoreScript = path.resolve(__dirname, 'restore-data.mjs');
+        const { execSync } = await import('child_process');
+        execSync(`node "${restoreScript}"`, { stdio: 'inherit' });
+        console.log("🟢 Successfully restored guest data from Aug 1");
+      } catch (e) {
+        console.error("🔴 Failed to restore guest data:", e.message);
+      }
     }
 
     console.log("🎉 Database schema & tables initialized successfully.");

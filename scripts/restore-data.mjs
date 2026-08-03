@@ -4,8 +4,8 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = path.resolve(__dirname, "../artifacts/api-server/sqlite.db").replace(/\\/g, '/');
-const url = `file:${dbPath}`;
+const dbPath = path.resolve(__dirname, "../sqlite.db").replace(/\\/g, '/');
+const url = process.env.DATABASE_URL || `file:${dbPath}`;
 
 const sqlite = createClient({ url });
 
@@ -729,7 +729,7 @@ async function main() {
     
     // Default to event_id = 1 (Sukoon Mehfil 1.0)
     // created_at needs to be a timestamp, default to 1722421370000 (roughly Jul 31)
-    const ts = new Date().getTime(); 
+    const ts = Math.floor(new Date().getTime() / 1000); 
     
     // Generate a simple ticket code
     const ticketCode = 'RST-' + Math.random().toString(36).substring(2, 8).toUpperCase();
