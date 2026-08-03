@@ -72,14 +72,14 @@ const possibleFrontendPaths = [
 
 const frontendPath = possibleFrontendPaths.find((p) => fs.existsSync(path.join(p, "index.html"))) || possibleFrontendPaths[0];
 
-app.use(express.static(frontendPath));
+app.use(express.static(frontendPath, { dotfiles: "allow" }));
 
 // Fallback all non-API routes to index.html for client-side SPA routing
 app.use((req, res, next) => {
   if (req.method === "GET" && !req.path.startsWith("/api")) {
     const indexPath = path.resolve(frontendPath, "index.html");
     if (fs.existsSync(indexPath)) {
-      return res.sendFile(indexPath);
+      return res.sendFile(indexPath, { dotfiles: "allow" });
     } else {
       return res.status(200).send("<h1>Sukoon API Server Running</h1>");
     }
