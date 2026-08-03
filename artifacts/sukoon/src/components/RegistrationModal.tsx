@@ -5,6 +5,7 @@ import { Loader2, Calendar, MapPin, ShieldAlert, CheckCircle2, Sparkles, Chevron
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { MusicalPassCard } from "@/components/MusicalPassCard";
+import { format } from "date-fns";
 
 interface RegistrationModalProps {
   isOpen: boolean;
@@ -13,14 +14,17 @@ interface RegistrationModalProps {
 
 const DEPARTMENTS = [
   "Anaesthesia",
-  "Internal Medicine",
   "Cardiology",
+  "Hematology",
+  "Hepatology",
+  "Internal Medicine",
+  "Microbiology",
   "Nursing",
-  "Pediatrics",
-  "Surgery",
   "Orthopedics",
+  "Parasitology",
+  "Pediatrics",
   "Radiology",
-  "Admin / Staff",
+  "Surgery",
   "Other PGIMER Dept",
 ];
 
@@ -153,7 +157,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
               <DialogHeader className="space-y-2 text-left pr-8">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/25 text-amber-300 text-[10px] sm:text-[11px] font-medium tracking-widest uppercase">
                   <Calendar className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span>Sat. 1st August 2026 @ 6:00 PM</span>
+                  <span>{currentEvent?.date ? format(new Date(currentEvent.date), "E. do MMMM yyyy '@' h:mm a") : "Coming Soon"}</span>
                 </div>
 
                 <DialogTitle className="text-xl sm:text-2xl font-serif tracking-tight text-white leading-snug">
@@ -175,7 +179,7 @@ export function RegistrationModal({ isOpen, onClose }: RegistrationModalProps) {
                 </div>
                 <div className="flex items-center gap-2 text-[10px] sm:text-[11px] text-red-300 bg-red-950/60 border border-red-500/30 px-3 py-1.5 rounded-lg font-medium tracking-wide leading-snug">
                   <ShieldAlert className="w-4 h-4 text-red-400 shrink-0" />
-                  <span>OUTSIDERS NOT ALLOWED (PGIMER Residents & Staff Only)</span>
+                  <span>OUTSIDERS NOT ALLOWED (PGIMER Staff, PhD Scholars and Residents Only)</span>
                 </div>
               </div>
 

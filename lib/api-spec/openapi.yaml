@@ -20,6 +20,9 @@ tags:
     description: Admin authentication
   - name: user
     description: User authentication and digital passes
+  - name: feedbacks
+    description: Guest feedbacks
+
 paths:
   /user/signup:
     post:
@@ -424,29 +427,10 @@ paths:
           description: Unauthorized
         "500":
           description: Internal server error
-
-  /admin/users:
-    get:
-      operationId: listUsers
-      tags: [admin]
-      summary: List all registered user accounts (admin only)
-      responses:
-        "200":
-          description: List of user accounts
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/UserProfile"
-        "401":
-          description: Unauthorized
-
-  /admin/users/{id}:
     delete:
-      operationId: deleteUser
+      operationId: deleteEvent
       tags: [admin]
-      summary: Delete a registered user account (admin only)
+      summary: Delete an event and its associated data
       parameters:
         - name: id
           in: path
@@ -455,11 +439,81 @@ paths:
             type: integer
       responses:
         "200":
-          description: Account deleted successfully
+          description: Deleted
         "401":
           description: Unauthorized
-        "404":
-          description: User not found
+
+  /feedbacks:
+    get:
+      operationId: listFeedbacks
+      tags: [feedbacks]
+      summary: List feedbacks
+      parameters:
+        - name: eventId
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feedback'
+    post:
+      operationId: createFeedback
+      tags: [feedbacks]
+      summary: Submit new feedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feedback'
+        '400':
+          description: Validation error
+  /admin/events:
+    post:
+      operationId: createEvent
+      tags: [admin]
+      summary: Create an event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdateInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+  /user/reset-password:
+    post:
+      operationId: userResetPassword
+      tags: [user]
+      summary: Reset user password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserResetPasswordInput'
+      responses:
+        '200':
+          description: Success
 
 components:
   schemas:
@@ -720,4 +774,53 @@ components:
         checkedIn:
           type: boolean
         createdAt:
+          type: string
+
+
+    Feedback:
+      type: object
+      required: [id, eventId, name, department, rating, message, createdAt]
+      properties:
+        id:
+          type: integer
+        eventId:
+          type: integer
+        name:
+          type: string
+        department:
+          type: string
+        rating:
+          type: integer
+        message:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    FeedbackInput:
+      type: object
+      required: [eventId, name, department, rating, message]
+      properties:
+        eventId:
+          type: integer
+        name:
+          type: string
+          minLength: 2
+        department:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        message:
+          type: string
+          minLength: 5
+    UserResetPasswordInput:
+      type: object
+      required: [email, phone, newPassword]
+      properties:
+        email:
+          type: string
+        phone:
+          type: string
+        newPassword:
           type: string

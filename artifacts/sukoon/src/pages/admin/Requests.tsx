@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useListRequests, useUpdateRequestStatus, useGetEventStats, useListEvents, useAdminLogout, useListUsers, useDeleteUser, getListRequestsQueryKey, getGetEventStatsQueryKey, getListUsersQueryKey } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, BarChart2, List, Building2, Calendar, Users, Trash2, Mail, Phone, UserCheck } from "lucide-react";
+import { Loader2, BarChart2, List, Building2, Calendar, Users, Trash2, Mail, Phone, UserCheck, Download } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useAdminGuard } from "@/hooks/use-admin-guard";
@@ -19,7 +19,15 @@ export function AdminRequests() {
   const [activeTab, setActiveTab] = useState<"requests" | "analytics" | "users">("requests");
 
   const { data: events } = useListEvents();
-  const eventId = events?.[0]?.id;
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+
+  const sortedEvents = useMemo(() => {
+    if (!events) return [];
+    return [...events].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [events]);
+
+  const eventId = selectedEventId || sortedEvents[0]?.id;
+  const currentEvent = sortedEvents.find(e => e.id === eventId);
 
   const { data: requests, isLoading: loadingReqs } = useListRequests(
     { eventId },
@@ -98,6 +106,33 @@ export function AdminRequests() {
     );
   }, [users, userSearch]);
 
+  const exportToCSV = () => {
+    if (!filteredRequests || filteredRequests.length === 0) {
+      toast({ title: "No Data", description: "There are no registrations to export.", variant: "destructive" });
+      return;
+    }
+    const headers = ["Name", "Department", "Email", "Phone", "Attendance Possibility", "Status", "Registered At"];
+    const rows = filteredRequests.map(r => [
+      `"${(r.name || "").replace(/"/g, '""')}"`,
+      `"${(r.department || 'General PGIMER').replace(/"/g, '""')}"`,
+      `"${(r.email || "").replace(/"/g, '""')}"`,
+      `"${(r.phone || "").replace(/"/g, '""')}"`,
+      `"${(r.attendancePossibility || "").replace(/"/g, '""')}"`,
+      `"${(r.status || "").replace(/"/g, '""')}"`,
+      `"${format(new Date(r.createdAt), "yyyy-MM-dd HH:mm:ss")}"`
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `guest_list_${format(new Date(), "yyyy-MM-dd")}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    toast({ title: "Export Complete", description: "Guest list has been downloaded as a CSV file." });
+  };
+
   const statusLabel = (status: string) => {
     const map: Record<string, string> = {
       approved: "APPROVED",
@@ -163,13 +198,37 @@ export function AdminRequests() {
       <main className="px-4 sm:px-6 md:px-10 py-8 sm:py-12 max-w-7xl mx-auto space-y-8 sm:space-y-12">
         {/* Navigation Tabs */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 pb-4 gap-4">
-          <div>
-            <span className="text-[10px] sm:text-[11px] tracking-[0.2em] text-amber-400 uppercase font-medium block mb-1">
-              Event Control Center
-            </span>
-            <h1 className="text-xl sm:text-3xl font-serif text-white">
-              PGIMER Sat. 1st August 2026 Rooftop Session
-            </h1>
+          <div className="flex-1">
+            <div className="flex items-center gap-4 mb-2">
+              <span className="text-[10px] sm:text-[11px] tracking-[0.2em] text-amber-400 uppercase font-medium block">
+                Event Control Center
+              </span>
+              {sortedEvents.length > 0 && (
+                <Select value={eventId?.toString()} onValueChange={(val) => setSelectedEventId(Number(val))}>
+                  <SelectTrigger className="w-auto h-7 bg-zinc-900 border border-white/20 rounded-full text-[11px] tracking-wide text-white/80 font-medium focus:ring-0 px-3">
+                    <SelectValue placeholder="Select Event" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-950 border-white/10 text-white">
+                    {sortedEvents.map(ev => (
+                      <SelectItem key={ev.id} value={ev.id.toString()} className="text-[11px]">
+                        Edition {ev.editionNumber} • {format(new Date(ev.date), "MMM do")}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <h1 className="text-xl sm:text-3xl font-serif text-white">
+                {currentEvent ? currentEvent.title : "Loading Events..."}
+              </h1>
+            </div>
+            {currentEvent && (
+              <div className="text-[12px] text-white/40 mt-2 uppercase tracking-widest flex items-center gap-2">
+                <Calendar className="w-3.5 h-3.5" />
+                {format(new Date(currentEvent.date), "EEE. do MMMM yyyy @ h:mm a")}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-1.5 bg-zinc-950 p-1 sm:p-1.5 rounded-full border border-white/10 w-full sm:w-auto justify-center">
@@ -239,18 +298,27 @@ export function AdminRequests() {
               <h2 className="text-xl font-medium text-white tracking-tight">
                 Guest Registrations ({filteredRequests.length})
               </h2>
-              <Select value={filter} onValueChange={setFilter}>
-                <SelectTrigger className="w-[160px] h-9 bg-transparent border border-white/20 rounded-full text-[12px] tracking-[0.1em] uppercase text-white/60 font-medium focus:ring-0">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-950 border-white/10 text-white">
-                  <SelectItem value="all" className="text-[12px] tracking-wide uppercase">All</SelectItem>
-                  <SelectItem value="pending" className="text-[12px] tracking-wide uppercase">Pending</SelectItem>
-                  <SelectItem value="approved" className="text-[12px] tracking-wide uppercase">Approved</SelectItem>
-                  <SelectItem value="waitlisted" className="text-[12px] tracking-wide uppercase">Waitlisted</SelectItem>
-                  <SelectItem value="declined" className="text-[12px] tracking-wide uppercase">Declined</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={exportToCSV}
+                  className="flex items-center gap-2 px-4 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-[11px] font-medium tracking-wider uppercase transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Export to CSV
+                </button>
+                <Select value={filter} onValueChange={setFilter}>
+                  <SelectTrigger className="w-[160px] h-9 bg-transparent border border-white/20 rounded-full text-[12px] tracking-[0.1em] uppercase text-white/60 font-medium focus:ring-0">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-950 border-white/10 text-white">
+                    <SelectItem value="all" className="text-[12px] tracking-wide uppercase">All</SelectItem>
+                    <SelectItem value="pending" className="text-[12px] tracking-wide uppercase">Pending</SelectItem>
+                    <SelectItem value="approved" className="text-[12px] tracking-wide uppercase">Approved</SelectItem>
+                    <SelectItem value="waitlisted" className="text-[12px] tracking-wide uppercase">Waitlisted</SelectItem>
+                    <SelectItem value="declined" className="text-[12px] tracking-wide uppercase">Declined</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {loadingReqs ? (

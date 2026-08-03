@@ -25,17 +25,20 @@ import type {
   AttendanceRequest,
   AttendanceRequestInput,
   Event,
-  EventCreateInput,
   EventStats,
   EventUpdateInput,
+  Feedback,
+  FeedbackInput,
   Guest,
   HealthStatus,
+  ListFeedbacksParams,
   ListGuestsParams,
   ListRequestsParams,
   RequestStatusUpdate,
   UserLoginInput,
   UserPass,
   UserProfile,
+  UserResetPasswordInput,
   UserSignUpInput
 } from './api.schemas';
 
@@ -207,27 +210,6 @@ export const useUserLogin = <TError = ErrorType<void>,
       > => {
       return useMutation(getUserLoginMutationOptions(options));
     }
-
-export const getUserResetPasswordUrl = () => `/api/user/reset-password`;
-
-export const userResetPassword = async (data: { email: string; phone: string; newPassword: string }, options?: RequestInit): Promise<{ message: string }> => {
-  return customFetch<{ message: string }>(getUserResetPasswordUrl(), {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(data),
-  });
-};
-
-export const useUserResetPassword = <TError = ErrorType<void>, TContext = unknown>(
-  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof userResetPassword>>, TError, { data: { email: string; phone: string; newPassword: string } }, TContext>; request?: SecondParameter<typeof customFetch> }
-): UseMutationResult<Awaited<ReturnType<typeof userResetPassword>>, TError, { data: { email: string; phone: string; newPassword: string } }, TContext> => {
-  return useMutation({
-    mutationKey: ['userResetPassword'],
-    mutationFn: (props) => userResetPassword(props.data, options?.request),
-    ...options?.mutation,
-  });
-};
 
 export const getUserLogoutUrl = () => {
 
@@ -1440,6 +1422,154 @@ export function useGetAdminMe<TData = Awaited<ReturnType<typeof getAdminMe>>, TE
 
 
 
+export const getListUsersUrl = () => {
+
+
+
+
+  return `/api/admin/users`
+}
+
+/**
+ * @summary List all registered accounts
+ */
+export const listUsers = async ( options?: RequestInit): Promise<UserProfile[]> => {
+
+  return customFetch<UserProfile[]>(getListUsersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListUsersQueryKey = () => {
+    return [
+    `/api/admin/users`
+    ] as const;
+    }
+
+
+export const getListUsersQueryOptions = <TData = Awaited<ReturnType<typeof listUsers>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListUsersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listUsers>>> = ({ signal }) => listUsers({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListUsersQueryResult = NonNullable<Awaited<ReturnType<typeof listUsers>>>
+export type ListUsersQueryError = ErrorType<void>
+
+
+/**
+ * @summary List all registered accounts
+ */
+
+export function useListUsers<TData = Awaited<ReturnType<typeof listUsers>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListUsersQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDeleteUserUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/users/${id}`
+}
+
+/**
+ * @summary Delete user account
+ */
+export const deleteUser = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteUserUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteUserMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteUser'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteUser>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteUser(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteUserMutationResult = NonNullable<Awaited<ReturnType<typeof deleteUser>>>
+
+    export type DeleteUserMutationError = ErrorType<void>
+
+    /**
+ * @summary Delete user account
+ */
+export const useDeleteUser = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteUser>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteUserMutationOptions(options));
+    }
+
 export const getUpdateEventUrl = (id: number,) => {
 
 
@@ -1512,114 +1642,371 @@ export const useUpdateEvent = <TError = ErrorType<void>,
       return useMutation(getUpdateEventMutationOptions(options));
     }
 
-export const getCreateEventUrl = () => `/api/admin/events`;
+export const getDeleteEventUrl = (id: number,) => {
 
-export const createEvent = async (eventCreateInput: EventCreateInput, options?: RequestInit): Promise<Event> => {
-  return customFetch<Event>(getCreateEventUrl(), {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(eventCreateInput),
-  });
-};
 
-export const getCreateEventMutationOptions = <TError = ErrorType<void>, TContext = unknown>(
-  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError, { data: BodyType<EventCreateInput> }, TContext>; request?: SecondParameter<typeof customFetch> }
-): UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError, { data: BodyType<EventCreateInput> }, TContext> => {
-  const mutationKey = ['createEvent'];
-  const { mutation: mutationOptions, request: requestOptions } = options ? (options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ? options : { ...options, mutation: { ...options.mutation, mutationKey } }) : { mutation: { mutationKey }, request: undefined };
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createEvent>>, { data: BodyType<EventCreateInput> }> = (props) => {
-    const { data } = props ?? {};
-    return createEvent(data, requestOptions);
-  };
-  return { mutationFn, ...mutationOptions };
-};
 
-export const useCreateEvent = <TError = ErrorType<void>, TContext = unknown>(
-  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError, { data: BodyType<EventCreateInput> }, TContext>; request?: SecondParameter<typeof customFetch> }
-): UseMutationResult<Awaited<ReturnType<typeof createEvent>>, TError, { data: BodyType<EventCreateInput> }, TContext> => {
-  return useMutation(getCreateEventMutationOptions(options));
-};
 
-export const getDeleteEventUrl = (id: number) => `/api/admin/events/${id}`;
+  return `/api/admin/events/${id}`
+}
 
+/**
+ * @summary Delete an event and its associated data
+ */
 export const deleteEvent = async (id: number, options?: RequestInit): Promise<void> => {
-  return customFetch<void>(getDeleteEventUrl(id), {
+
+  return customFetch<void>(getDeleteEventUrl(id),
+  {
     ...options,
-    method: 'DELETE',
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteEventMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvent>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvent>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteEvent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvent>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvent(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEventMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvent>>>
+
+    export type DeleteEventMutationError = ErrorType<void>
+
+    /**
+ * @summary Delete an event and its associated data
+ */
+export const useDeleteEvent = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvent>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvent>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteEventMutationOptions(options));
+    }
+
+export const getListFeedbacksUrl = (params?: ListFeedbacksParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
   });
-};
 
-export const getDeleteEventMutationOptions = <TError = ErrorType<void>, TContext = unknown>(
-  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteEvent>>, TError, { id: number }, TContext>; request?: SecondParameter<typeof customFetch> }
-): UseMutationOptions<Awaited<ReturnType<typeof deleteEvent>>, TError, { id: number }, TContext> => {
-  const mutationKey = ['deleteEvent'];
-  const { mutation: mutationOptions, request: requestOptions } = options ? (options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ? options : { ...options, mutation: { ...options.mutation, mutationKey } }) : { mutation: { mutationKey }, request: undefined };
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvent>>, { id: number }> = (props) => {
-    const { id } = props ?? {};
-    return deleteEvent(id, requestOptions);
-  };
-  return { mutationFn, ...mutationOptions };
-};
+  const stringifiedParams = normalizedParams.toString();
 
-export const useDeleteEvent = <TError = ErrorType<void>, TContext = unknown>(
-  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteEvent>>, TError, { id: number }, TContext>; request?: SecondParameter<typeof customFetch> }
-): UseMutationResult<Awaited<ReturnType<typeof deleteEvent>>, TError, { id: number }, TContext> => {
-  return useMutation(getDeleteEventMutationOptions(options));
-};
+  return stringifiedParams.length > 0 ? `/api/feedbacks?${stringifiedParams}` : `/api/feedbacks`
+}
 
-export const getListUsersUrl = () => `/admin/users`;
+/**
+ * @summary List feedbacks
+ */
+export const listFeedbacks = async (params?: ListFeedbacksParams, options?: RequestInit): Promise<Feedback[]> => {
 
-export const listUsers = async (options?: RequestInit): Promise<UserProfile[]> => {
-  return customFetch<UserProfile[]>(getListUsersUrl(), {
+  return customFetch<Feedback[]>(getListFeedbacksUrl(params),
+  {
     ...options,
-    method: 'GET',
-  });
-};
+    method: 'GET'
 
-export const getListUsersQueryKey = () => [`/admin/users`] as const;
 
-export const getListUsersQueryOptions = <TData = Awaited<ReturnType<typeof listUsers>>, TError = ErrorType<void>>(
-  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>; request?: SecondParameter<typeof customFetch> }
+  }
+);}
+
+
+
+
+
+export const getListFeedbacksQueryKey = (params?: ListFeedbacksParams,) => {
+    return [
+    `/api/feedbacks`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListFeedbacksQueryOptions = <TData = Awaited<ReturnType<typeof listFeedbacks>>, TError = ErrorType<unknown>>(params?: ListFeedbacksParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listFeedbacks>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-  const queryKey = queryOptions?.queryKey ?? getListUsersQueryKey();
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof listUsers>>> = ({ signal }) => listUsers({ signal, ...requestOptions });
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData> & { queryKey: QueryKey };
-};
 
-export function useListUsers<TData = Awaited<ReturnType<typeof listUsers>>, TError = ErrorType<void>>(
-  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>; request?: SecondParameter<typeof customFetch> }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getListUsersQueryOptions(options);
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListFeedbacksQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listFeedbacks>>> = ({ signal }) => listFeedbacks(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listFeedbacks>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListFeedbacksQueryResult = NonNullable<Awaited<ReturnType<typeof listFeedbacks>>>
+export type ListFeedbacksQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List feedbacks
+ */
+
+export function useListFeedbacks<TData = Awaited<ReturnType<typeof listFeedbacks>>, TError = ErrorType<unknown>>(
+ params?: ListFeedbacksParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listFeedbacks>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListFeedbacksQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
   return withQueryKey(query, queryOptions.queryKey);
 }
 
-export const getDeleteUserUrl = (id: number) => `/admin/users/${id}`;
 
-export const deleteUser = async (id: number, options?: RequestInit): Promise<void> => {
-  return customFetch<void>(getDeleteUserUrl(id), {
+
+
+
+
+
+export const getCreateFeedbackUrl = () => {
+
+
+
+
+  return `/api/feedbacks`
+}
+
+/**
+ * @summary Submit new feedback
+ */
+export const createFeedback = async (feedbackInput: FeedbackInput, options?: RequestInit): Promise<Feedback> => {
+
+  return customFetch<Feedback>(getCreateFeedbackUrl(),
+  {
     ...options,
-    method: 'DELETE',
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(feedbackInput)
+  }
+);}
 
-export const getDeleteUserMutationOptions = <TError = ErrorType<void>, TContext = unknown>(
-  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError, { id: number }, TContext>; request?: SecondParameter<typeof customFetch> }
-): UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError, { id: number }, TContext> => {
-  const mutationKey = ['deleteUser'];
-  const { mutation: mutationOptions, request: requestOptions } = options ? (options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ? options : { ...options, mutation: { ...options.mutation, mutationKey } }) : { mutation: { mutationKey }, request: undefined };
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteUser>>, { id: number }> = (props) => {
-    const { id } = props ?? {};
-    return deleteUser(id, requestOptions);
-  };
-  return { mutationFn, ...mutationOptions };
-};
 
-export const useDeleteUser = <TError = ErrorType<void>, TContext = unknown>(
-  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError, { id: number }, TContext>; request?: SecondParameter<typeof customFetch> }
-): UseMutationResult<Awaited<ReturnType<typeof deleteUser>>, TError, { id: number }, TContext> => {
-  return useMutation(getDeleteUserMutationOptions(options));
-};
+
+
+
+export const getCreateFeedbackMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFeedback>>, TError,{data: BodyType<FeedbackInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createFeedback>>, TError,{data: BodyType<FeedbackInput>}, TContext> => {
+
+const mutationKey = ['createFeedback'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createFeedback>>, {data: BodyType<FeedbackInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createFeedback(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateFeedbackMutationResult = NonNullable<Awaited<ReturnType<typeof createFeedback>>>
+    export type CreateFeedbackMutationBody = BodyType<FeedbackInput>
+    export type CreateFeedbackMutationError = ErrorType<void>
+
+    /**
+ * @summary Submit new feedback
+ */
+export const useCreateFeedback = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFeedback>>, TError,{data: BodyType<FeedbackInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createFeedback>>,
+        TError,
+        {data: BodyType<FeedbackInput>},
+        TContext
+      > => {
+      return useMutation(getCreateFeedbackMutationOptions(options));
+    }
+
+export const getCreateEventUrl = () => {
+
+
+
+
+  return `/api/admin/events`
+}
+
+/**
+ * @summary Create an event
+ */
+export const createEvent = async (eventUpdateInput: EventUpdateInput, options?: RequestInit): Promise<Event> => {
+
+  return customFetch<Event>(getCreateEventUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(eventUpdateInput)
+  }
+);}
+
+
+
+
+
+export const getCreateEventMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError,{data: BodyType<EventUpdateInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError,{data: BodyType<EventUpdateInput>}, TContext> => {
+
+const mutationKey = ['createEvent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createEvent>>, {data: BodyType<EventUpdateInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createEvent(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateEventMutationResult = NonNullable<Awaited<ReturnType<typeof createEvent>>>
+    export type CreateEventMutationBody = BodyType<EventUpdateInput>
+    export type CreateEventMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Create an event
+ */
+export const useCreateEvent = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError,{data: BodyType<EventUpdateInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createEvent>>,
+        TError,
+        {data: BodyType<EventUpdateInput>},
+        TContext
+      > => {
+      return useMutation(getCreateEventMutationOptions(options));
+    }
+
+export const getUserResetPasswordUrl = () => {
+
+
+
+
+  return `/api/user/reset-password`
+}
+
+/**
+ * @summary Reset user password
+ */
+export const userResetPassword = async (userResetPasswordInput: UserResetPasswordInput, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getUserResetPasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(userResetPasswordInput)
+  }
+);}
+
+
+
+
+
+export const getUserResetPasswordMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof userResetPassword>>, TError,{data: BodyType<UserResetPasswordInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof userResetPassword>>, TError,{data: BodyType<UserResetPasswordInput>}, TContext> => {
+
+const mutationKey = ['userResetPassword'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof userResetPassword>>, {data: BodyType<UserResetPasswordInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  userResetPassword(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UserResetPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof userResetPassword>>>
+    export type UserResetPasswordMutationBody = BodyType<UserResetPasswordInput>
+    export type UserResetPasswordMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Reset user password
+ */
+export const useUserResetPassword = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof userResetPassword>>, TError,{data: BodyType<UserResetPasswordInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof userResetPassword>>,
+        TError,
+        {data: BodyType<UserResetPasswordInput>},
+        TContext
+      > => {
+      return useMutation(getUserResetPasswordMutationOptions(options));
+    }
 

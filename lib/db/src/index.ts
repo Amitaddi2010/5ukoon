@@ -95,6 +95,19 @@ export async function ensureDatabaseSchema() {
       );
     `);
 
+    // 6. Create feedbacks table
+    await sqlite.execute(`
+      CREATE TABLE IF NOT EXISTS feedbacks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        department TEXT NOT NULL,
+        rating INTEGER NOT NULL,
+        message TEXT NOT NULL,
+        created_at INTEGER NOT NULL
+      );
+    `);
+
     // Column migrations for existing tables created before new features
     const migrations = [
       "ALTER TABLE events ADD COLUMN original_price REAL",

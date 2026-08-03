@@ -8,13 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
 
-// Ensure database path exists
-const dbDir = path.resolve(rootDir, "lib/db");
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
-}
-
-const dbPath = path.resolve(dbDir, "sqlite.db").replace(/\\/g, "/");
+const dbPath = path.resolve(rootDir, "sqlite.db").replace(/\\/g, "/");
 const url = process.env.DATABASE_URL || `file:${dbPath}`;
 
 function hashPassword(password) {

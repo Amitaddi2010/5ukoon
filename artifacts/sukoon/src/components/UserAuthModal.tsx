@@ -13,14 +13,17 @@ interface UserAuthModalProps {
 
 const DEPARTMENTS = [
   "Anaesthesia",
-  "Internal Medicine",
   "Cardiology",
+  "Hematology",
+  "Hepatology",
+  "Internal Medicine",
+  "Microbiology",
   "Nursing",
-  "Pediatrics",
-  "Surgery",
   "Orthopedics",
+  "Parasitology",
+  "Pediatrics",
   "Radiology",
-  "Admin / Staff",
+  "Surgery",
   "Other PGIMER Dept",
 ];
 

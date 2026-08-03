@@ -42,16 +42,30 @@ interface EventFormData {
   rsvpLink: string;
 }
 
+const getFallbackDateInput = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 14);
+  d.setHours(18, 0, 0, 0);
+  return d.toISOString().slice(0, 16);
+};
+
+const getFallbackDateDisplay = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 14);
+  d.setHours(18, 0, 0, 0);
+  return format(d, "EEEE, MMM d, yyyy '@' h:mm a");
+};
+
 const defaultFormState: EventFormData = {
-  title: "Sukoon Mehfil – Rooftop Session",
+  title: "",
   editionNumber: 1,
-  date: "2026-08-01T18:00",
+  date: getFallbackDateInput(),
   city: "Chandigarh",
   venue: "ODH Mess Rooftop, PGIMER",
   capacity: 25,
   price: 299,
   originalPrice: 499,
-  offerText: "EARLY BIRD OFFER",
+  offerText: "EARLY BIRD",
   status: "upcoming",
   rsvpLink: "",
 };
@@ -65,7 +79,7 @@ function parseDateForInput(rawDate: string): string {
   } catch {
     // fallback
   }
-  return "2026-08-01T18:00";
+  return getFallbackDateInput();
 }
 
 function formatDateDisplay(rawDate: string): string {
@@ -77,7 +91,7 @@ function formatDateDisplay(rawDate: string): string {
   } catch {
     // fallback
   }
-  return "Saturday, Aug 1, 2026 @ 6:00 PM";
+  return getFallbackDateDisplay();
 }
 
 export function AdminEvents() {

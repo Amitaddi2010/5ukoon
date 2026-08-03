@@ -360,6 +360,29 @@ export const GetAdminMeResponse = zod.object({
 
 
 /**
+ * @summary List all registered accounts
+ */
+export const ListUsersResponseItem = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "department": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string()
+})
+export const ListUsersResponse = zod.array(ListUsersResponseItem)
+
+
+/**
+ * @summary Delete user account
+ */
+export const DeleteUserParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteUserResponse = zod.unknown()
+
+
+/**
  * @summary Update event pricing and offers (admin only)
  */
 export const UpdateEventParams = zod.object({
@@ -373,5 +396,102 @@ export const UpdateEventBody = zod.object({
 })
 
 export const UpdateEventResponse = zod.unknown()
+
+
+/**
+ * @summary Delete an event and its associated data
+ */
+export const DeleteEventParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteEventResponse = zod.unknown()
+
+
+/**
+ * @summary List feedbacks
+ */
+export const ListFeedbacksQueryParams = zod.object({
+  "eventId": zod.coerce.number().optional()
+})
+
+export const ListFeedbacksResponseItem = zod.object({
+  "id": zod.number(),
+  "eventId": zod.number(),
+  "name": zod.string(),
+  "department": zod.string(),
+  "rating": zod.number(),
+  "message": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+export const ListFeedbacksResponse = zod.array(ListFeedbacksResponseItem)
+
+
+/**
+ * @summary Submit new feedback
+ */
+export const createFeedbackBodyNameMin = 2;
+
+export const createFeedbackBodyRatingMax = 5;
+
+export const createFeedbackBodyMessageMin = 5;
+
+
+
+export const CreateFeedbackBody = zod.object({
+  "eventId": zod.number(),
+  "name": zod.string().min(createFeedbackBodyNameMin),
+  "department": zod.string(),
+  "rating": zod.number().min(1).max(createFeedbackBodyRatingMax),
+  "message": zod.string().min(createFeedbackBodyMessageMin)
+})
+
+export const CreateFeedbackResponse = zod.object({
+  "id": zod.number(),
+  "eventId": zod.number(),
+  "name": zod.string(),
+  "department": zod.string(),
+  "rating": zod.number(),
+  "message": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Create an event
+ */
+export const CreateEventBody = zod.object({
+  "price": zod.number().optional(),
+  "originalPrice": zod.number().optional(),
+  "offerText": zod.string().optional()
+})
+
+export const CreateEventResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "editionNumber": zod.number(),
+  "date": zod.coerce.date(),
+  "city": zod.string(),
+  "venue": zod.string().nullable(),
+  "capacity": zod.number(),
+  "price": zod.number(),
+  "originalPrice": zod.number().nullish(),
+  "offerText": zod.string().nullish(),
+  "status": zod.enum(['upcoming', 'past', 'cancelled']),
+  "rsvpLink": zod.string().nullish(),
+  "createdAt": zod.coerce.date().optional()
+})
+
+
+/**
+ * @summary Reset user password
+ */
+export const UserResetPasswordBody = zod.object({
+  "email": zod.string(),
+  "phone": zod.string(),
+  "newPassword": zod.string()
+})
+
+export const UserResetPasswordResponse = zod.unknown()
 
 

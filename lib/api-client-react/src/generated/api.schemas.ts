@@ -48,32 +48,10 @@ export interface EventStats {
   arrived: number;
 }
 
-export interface EventCreateInput {
-  title: string;
-  editionNumber?: number;
-  date: string;
-  city?: string;
-  venue?: string;
-  capacity?: number;
-  price?: number;
-  originalPrice?: number;
-  offerText?: string;
-  status?: EventStatus;
-  rsvpLink?: string;
-}
-
 export interface EventUpdateInput {
-  title?: string;
-  editionNumber?: number;
-  date?: string;
-  city?: string;
-  venue?: string;
-  capacity?: number;
   price?: number;
   originalPrice?: number;
   offerText?: string;
-  status?: EventStatus;
-  rsvpLink?: string;
 }
 
 export type AttendanceRequestStatus = typeof AttendanceRequestStatus[keyof typeof AttendanceRequestStatus];
@@ -224,6 +202,36 @@ export interface UserPass {
   createdAt: string;
 }
 
+export interface Feedback {
+  id: number;
+  eventId: number;
+  name: string;
+  department: string;
+  rating: number;
+  message: string;
+  createdAt: string;
+}
+
+export interface FeedbackInput {
+  eventId: number;
+  /** @minLength 2 */
+  name: string;
+  department: string;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  rating: number;
+  /** @minLength 5 */
+  message: string;
+}
+
+export interface UserResetPasswordInput {
+  email: string;
+  phone: string;
+  newPassword: string;
+}
+
 export type ListRequestsParams = {
 eventId?: number;
 status?: ListRequestsStatus;
@@ -240,6 +248,10 @@ export const ListRequestsStatus = {
 } as const;
 
 export type ListGuestsParams = {
+eventId?: number;
+};
+
+export type ListFeedbacksParams = {
 eventId?: number;
 };
 

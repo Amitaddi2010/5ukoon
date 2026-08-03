@@ -3,8 +3,10 @@ import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from "fram
 import { useListEvents } from "@workspace/api-client-react";
 import { Navbar } from "@/components/Navbar";
 import { RegistrationModal } from "@/components/RegistrationModal";
+import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { Calendar, ShieldAlert, Sparkles } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { format } from "date-fns";
 import $ from "jquery";
 
 const fadeUp = {
@@ -265,7 +267,9 @@ export function ImmersiveWaterBackground() {
 
 export function Home() {
   const { data: events } = useListEvents();
-  const nextEvent = events?.[0];
+  // Filter events to only show upcoming ones
+  const activeEvents = events?.filter(e => new Date(e.date).getTime() > Date.now()) || [];
+  const nextEvent = activeEvents[0] || events?.[0]; // fallback to the most recent if no upcoming
   const [isRegModalOpen, setIsRegModalOpen] = useState(false);
 
   // Auto popup modal on initial landing for high visibility (only once per session)
@@ -308,7 +312,7 @@ export function Home() {
             <div className="inline-flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-amber-500/20 border border-amber-400/40 backdrop-blur-md hover:border-amber-300 hover:scale-[1.02] transition-all shadow-xl max-w-full">
               <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping shrink-0" />
               <span className="text-[10px] sm:text-[12px] font-medium text-amber-200 tracking-wide truncate">
-                Sat. 1st Aug 2026 @ 6:00 PM • Rooftop PGIMER
+                {nextEvent?.date ? format(new Date(nextEvent.date), "E. do MMM yyyy '@' h:mm a") : "Coming Soon"} • {nextEvent?.venue || "PGIMER"}
               </span>
               <span className="text-[8px] sm:text-[10px] bg-red-950/90 border border-red-500/40 text-red-300 px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0">
                 PGIMER Only
@@ -560,7 +564,7 @@ export function Home() {
              
              <div className="relative z-10 w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                <span className="text-[10px] sm:text-[11px] tracking-[0.2em] text-[var(--accent-gold)] uppercase font-medium">Next Edition</span>
-               <span className="text-[10px] sm:text-[11px] tracking-[0.2em] text-white/50 uppercase font-medium border border-white/10 px-3 py-1 rounded-full">25 Seats Only</span>
+               <span className="text-[10px] sm:text-[11px] tracking-[0.2em] text-white/50 uppercase font-medium border border-white/10 px-3 py-1 rounded-full">{nextEvent?.capacity ?? 25} Seats Only</span>
              </div>
              
              <div className="relative z-10 mt-6 sm:mt-auto w-full flex flex-col lg:flex-row lg:items-end justify-between gap-6 sm:gap-8">
@@ -600,36 +604,7 @@ export function Home() {
       </section>
 
       {/* ─── 06 VOICES FROM THE ROOM ──────────────────────────── */}
-      <section className="py-20 md:py-32 px-4 md:px-8 max-w-7xl mx-auto">
-        <SectionPanel className="p-10 md:p-20">
-          <div className="grid md:grid-cols-[120px_1fr] gap-12 md:gap-20">
-            <motion.div {...fadeUp} className="pt-1">
-              <span className="text-[11px] tracking-[0.2em] text-white/25 uppercase font-medium flex items-center gap-2">
-                <span className="accent-dot" />
-                06
-              </span>
-            </motion.div>
-            <motion.div {...fadeUp} className="w-full">
-              <AnimatedText 
-                text={"Voices from\nthe Room"} 
-                className="font-display font-normal text-4xl md:text-6xl text-white mb-16 leading-[1.05] tracking-[-0.02em]" 
-              />
-              <div className="grid md:grid-cols-3 gap-0">
-                {[
-                  { q: "I haven't felt this seen in a room full of strangers in years.", a: "Founder, 32" },
-                  { q: "It's like therapy, but set to a soundtrack that understands you.", a: "Creative Director, 28" },
-                  { q: "A rare pocket of genuine intimacy in an otherwise noisy city.", a: "Architect, 35" }
-                ].map((item, i) => (
-                  <div key={i} className={`p-8 md:p-10 border border-white/[0.05] ${i !== 0 ? 'border-t-0 md:border-t md:border-l-0' : ''}`}>
-                    <p className="font-serif text-xl italic text-white/80 leading-relaxed mb-6">"{item.q}"</p>
-                    <p className="text-[12px] uppercase tracking-widest text-[var(--accent-gold)]">{item.a}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </SectionPanel>
-      </section>
+      <TestimonialsSection eventId={nextEvent?.id} />
 
       {/* ─── 07 FAQ ───────────────────────────────────────────── */}
       <section className="pt-16 pb-12 md:pt-24 md:pb-16 px-4 md:px-8 max-w-7xl mx-auto">
